@@ -1,1 +1,1 @@
-{"latest":"1.7.56","url":"https://sr-lolo.github.io/luna/Luna.apk"}
+{"latest":"1.7.60","url":"https://sr-lolo.github.io/luna/Luna.apk","fallback_url":"https://github.com/Sr-Lolo/luna/releases/latest/download/Luna.apk","sha256":"","min_version":"1.0.0","release_date":"2026-07-20","force_update":false,"changelog":"• Sistema de actualización renovado con verificación SHA-256\n• Nueva ventana de actualización con changelog\n• Reintento automático con URL alternativa\n• Modo de actualización forzada para cambios críticos\n• Corrección del botón \"Ahora no\" (espera 7 días)"}
