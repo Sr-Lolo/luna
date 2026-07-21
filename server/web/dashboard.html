@@ -281,6 +281,7 @@
         <button class="theme-editor-btn" onclick="location.href='/ayuda'">❓ <span data-i18n="dash.help">Ayuda</span></button>
       </div>
       <div class="header-right-right">
+        <span id="adb-badge" class="adb-badge" title="ADB" style="display:none;margin-right:8px;padding:2px 8px;border-radius:4px;font-size:11px;border:1px solid var(--border-light);background:rgba(76,175,80,0.08);color:var(--text-muted);">ADB <span id="adb-status-label">...</span></span>
         <span id="pairing-badge" class="pairing-badge" title="Código para emparejar móvil">
           <span class="pairing-label" data-i18n="dash.pairing_label">&#x1F517;</span>
           <span class="pairing-code" id="pairing-code-display">--</span>
@@ -1955,8 +1956,33 @@
       tooltip.classList.remove('visible');
     });
 
+    function fetchAdbStatus() {
+      fetch('/api/adb-status')
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var badge = document.getElementById('adb-badge');
+          var label = document.getElementById('adb-status-label');
+          if (!badge || !label) return;
+          if (data.status === 'ok') {
+            badge.style.display = 'inline';
+            label.textContent = '\u2713';
+            badge.style.borderColor = 'rgba(76,175,80,0.3)';
+            badge.style.color = '#4CAF50';
+          } else if (data.status === 'no_adb') {
+            badge.style.display = 'inline';
+            label.textContent = '\u2753';
+            badge.style.borderColor = 'rgba(255,152,0,0.3)';
+            badge.style.color = '#FF9800';
+            badge.title = 'ADB no encontrado. Descarga: https://developer.android.com/studio/releases/platform-tools';
+          } else {
+            badge.style.display = 'none';
+          }
+        })
+        .catch(function() {});
+    }
     fetchIp();
     fetchPairingCode();
+    fetchAdbStatus();
     setInterval(fetchPairingCode, 10000);
   })();
 

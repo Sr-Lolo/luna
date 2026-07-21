@@ -5,7 +5,7 @@ a = Analysis(
     ['C:\\Users\\Infinity Tech\\Desktop\\Mis Cosas\\Proyecto Luna\\LunaDeck v1.7.55\\server\\src\\gui.py'],
     pathex=[],
     binaries=[],
-    datas=[('web', 'web'), ('web_ad', 'web_ad'), ('app.ico', '.'), ('..\\docs\\Luna.apk', 'apk')],
+    datas=[('web', 'web'), ('web_ad', 'web_ad'), ('app.ico', '.')],
     hiddenimports=['zeroconf', 'zeroconf._utils.ipaddress', 'zeroconf._handlers.answers', 'queue', 'ctypes', 'winreg', 'urllib.request'],
     hookspath=[],
     hooksconfig={},

@@ -34,11 +34,6 @@ else:
     DATA_DIR = BASE_DIR
     PROJECT_ROOT = os.path.join(BASE_DIR, "..", "..")
 
-if getattr(sys, "frozen", False):
-    APK_PATH = os.path.join(BASE_DIR, "apk", "Luna.apk")
-else:
-    APK_PATH = os.path.join(os.path.dirname(BASE_DIR), "docs", "Luna.apk")
-
 CUSTOM_ICONS_DIR = os.path.join(DATA_DIR, "custom_icons")
 SOUNDS_DIR = os.path.join(DATA_DIR, "custom_sounds")
 EXES_DIR = os.path.join(DATA_DIR, "custom_exes")
@@ -164,6 +159,69 @@ _zc_instance = None
 _udp_server_running = False
 _udp_thread: threading.Thread | None = None
 
+# ── ADB ──
+_adb_forwarding = False
+_adb_retry_running = False
+_adb_thread: threading.Thread | None = None
+
+def _find_adb():
+    import shutil
+    return shutil.which("adb")
+
+def _setup_adb_forward():
+    import subprocess
+    adb = _find_adb()
+    if not adb:
+        print("[adb] adb no encontrado en PATH — descarga desde https://developer.android.com/studio/releases/platform-tools")
+        return False
+    try:
+        r = subprocess.run([adb, "reverse", "tcp:9120", "tcp:9120"], capture_output=True, text=True, timeout=5, creationflags=_NO_WINDOW)
+        if r.returncode == 0:
+            print("[adb] reverse tcp:9120 → tcp:9120 OK")
+            global _adb_forwarding
+            _adb_forwarding = True
+            return True
+        print(f"[adb] reverse falló: {r.stderr.strip()}")
+        return False
+    except Exception as e:
+        print(f"[adb] error: {e}")
+        return False
+
+def _stop_adb_forward():
+    import subprocess
+    adb = _find_adb()
+    if not adb:
+        return
+    try:
+        subprocess.run([adb, "reverse", "--remove", "tcp:9120"], capture_output=True, timeout=5, creationflags=_NO_WINDOW)
+    except Exception:
+        pass
+    global _adb_forwarding
+    _adb_forwarding = False
+
+def _adb_retry_loop():
+    global _adb_retry_running
+    while _adb_retry_running:
+        if not _adb_forwarding:
+            _setup_adb_forward()
+        for _ in range(10):
+            if not _adb_retry_running:
+                return
+            time.sleep(0.5)
+
+def _start_adb_retry():
+    global _adb_retry_running, _adb_thread
+    if _adb_retry_running:
+        return
+    _adb_retry_running = True
+    _adb_thread = threading.Thread(target=_adb_retry_loop, daemon=True)
+    _adb_thread.start()
+    print("[adb] retry thread started")
+
+def _stop_adb_retry():
+    global _adb_retry_running
+    _adb_retry_running = False
+
 # ── Pairing ──
 _pairing_code: str | None = None
 _pairing_code_expires: float = 0
@@ -263,7 +321,10 @@ async def lifespan(application: FastAPI):
     _start_udp_discovery()
     asyncio.create_task(_init_mdns_background(application))
     asyncio.create_task(_init_license_background())
+    _start_adb_retry()
     yield
+    _stop_adb_retry()
+    _stop_adb_forward()
     _stop_udp_discovery()
     global _zc_instance, _zeroconf_registered, _zc_service_info
     if _zeroconf_registered and _zc_instance is not None:
@@ -741,10 +802,24 @@ async def api_restore_themes():
 
 
 @app.get("/apk")
-async def apk_download():
-    if os.path.isfile(APK_PATH):
-        return FileResponse(APK_PATH, media_type="application/vnd.android.package-archive", filename="Luna.apk")
+async def apk_redirect():
     return RedirectResponse(url="https://sr-lolo.github.io/luna/")
+
+@app.get("/api/adb-status")
+async def api_adb_status():
+    adb = _find_adb()
+    if not adb:
+        return JSONResponse({"status": "no_adb"})
+    if _adb_forwarding:
+        return JSONResponse({"status": "ok"})
+    return JSONResponse({"status": "not_setup"})
+
+@app.post("/api/adb-setup")
+async def api_adb_setup():
+    ok = _setup_adb_forward()
+    if ok:
+        return JSONResponse({"ok": True, "status": "ok"})
+    return JSONResponse({"ok": False, "status": "no_adb"}, status_code=400)
 
 
 @app.get("/api/qr-apk")

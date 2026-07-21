@@ -1028,7 +1028,8 @@ class MainActivity : AppCompatActivity() {
 
         menuItem(android.R.drawable.ic_menu_manage, getString(R.string.menu_settings)) { showSettingsDialog() }
         menuItem(android.R.drawable.ic_menu_directions, getString(R.string.connect_usb)) {
-            startWifiDiscovery()
+            serverIp = "127.0.0.1"; serverPort = 9120
+            saveIp("127.0.0.1:9120"); connectToServer()
         }
 
         val dialog = AlertDialog.Builder(this, R.style.Theme_Luna_Dialog)
@@ -2365,8 +2366,7 @@ class MainActivity : AppCompatActivity() {
                 val currentVersion = packageManager.getPackageInfo(packageName, android.content.pm.PackageManager.PackageInfoFlags.of(0L)).versionName ?: "1.0.0"
 
                 if (compareVersions(serverVersion, currentVersion) > 0) {
-                    val localUrl = "http://$serverIp:$serverPort/apk"
-                    runOnUiThread { showUpdateDialog(serverVersion, "", false, "", localUrl, fallbackApkDownloadUrl) }
+                    runOnUiThread { showUpdateDialog(serverVersion, "", false, "", apkDownloadUrl, fallbackApkDownloadUrl) }
                 }
 
             } catch (_: Exception) {}
@@ -3102,12 +3102,10 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun connectUSB() {
             runOnUiThread {
-                AlertDialog.Builder(this@MainActivity, R.style.Theme_Luna_Dialog)
-                    .setTitle("Conexi\u00f3n USB Tethering")
-                    .setMessage("Activa \u00abAnclaje USB\u00bb en tu m\u00f3vil:\nAjustes > Redes > Zona WiFi/Anclaje > Anclaje USB\n\nDespu\u00e9s pulsa Buscar para encontrar tu PC.")
-                    .setPositiveButton("Buscar") { _, _ -> startWifiDiscovery() }
-                    .setNegativeButton("Cancelar", null)
-                    .show()
+                serverIp = "127.0.0.1"
+                serverPort = 9120
+                saveIp("127.0.0.1:9120")
+                connectToServer()
             }
         }
 

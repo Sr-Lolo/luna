@@ -3,8 +3,8 @@
   "min_version": "1.0.0",
   "url": "https://sr-lolo.github.io/luna/Luna.apk",
   "fallback_url": "https://github.com/Sr-Lolo/luna/releases/download/v1.8.0/Luna.apk",
-  "sha256": "fd8f6a015522ab9412936ecba1132afa64ff8c93254a020a47799dedd79fd1e6",
+  "sha256": "b76584405376e207a15c2440d429c1d104cab122070942a0cc5ba067bd6ab947",
   "release_date": "2026-07-21",
   "force_update": false,
-  "changelog": "• Nueva conexi\u00f3n por USB Tethering (ya no requiere ADB ni Depuraci\u00f3n USB)\n• Descubrimiento mejorado del PC (todas las IPs de red)\n• Actualizaci\u00f3n directa desde el PC (sin internet)\n• Onboarding actualizado con instrucciones de Anclaje USB\n• Versi\u00f3n 1.8.0"
+  "changelog": "• Compatibilidad con ADB restaurada (USB Debugging)\n• Enlace para descargar ADB si no est\u00e1 instalado\n• Descubrimiento mejorado del PC (todas las IPs de red)\n• Onboarding actualizado con instrucciones de ADB\n• Versi\u00f3n 1.8.0"
 }

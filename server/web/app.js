@@ -875,6 +875,7 @@ const saved = localStorage.getItem('luna_profile');
 // Connection info (desktop only — IP + QR)
 const connInfo = document.getElementById('conn-info');
 const connIp = document.getElementById('conn-ip');
+const connAdb = document.getElementById('conn-adb');
 const connQrBtn = document.getElementById('conn-qr-btn');
 const qrModal = document.getElementById('qr-modal');
 const qrImg = document.getElementById('qr-img');
@@ -891,6 +892,12 @@ if (connInfo && document.documentElement.classList.contains('desktop')) {
       ipText = data.ip + ':' + data.port;
     }
     connIp.innerHTML = __('status.ip_info').replace('{0}', '<strong>' + ipText + '</strong>');
+    if (connAdb) {
+      fetch('/api/adb-status').then(function(r) { return r.json(); }).then(function(d) {
+        if (d.status === 'ok') { connAdb.style.display = 'inline'; }
+        else if (d.status === 'no_adb') { connAdb.style.display = 'inline'; connAdb.style.background = 'rgba(255,152,0,0.15)'; connAdb.style.color = '#FF9800'; connAdb.textContent = 'ADB?'; }
+      }).catch(function() {});
+    }
     qrImg.src = '/api/qr?' + Date.now();
     qrIpLabel.textContent = 'http://' + ipText;
   }).catch(() => {

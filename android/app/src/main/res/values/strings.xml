@@ -81,7 +81,7 @@ control your PC instantly</string>
     <string name="auto_switch">Auto switch</string>
     <string name="hide_ui">Hide UI</string>
     <string name="rescan_qr">Scan QR</string>
-    <string name="connect_usb">Connect via USB Tethering</string>
+    <string name="connect_usb">Connect via USB</string>
     <string name="settings_change_connection">Change connection</string>
     <string name="settings_change_connection_summary">Disconnect and choose another method</string>
     <string name="slider_volume">Volume</string>
