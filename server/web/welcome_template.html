@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0D0D0D">
+<title>Luna</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{height:100vh;background:#0D0D0D;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#E0E0E0;padding:24px;text-align:center}
+
+  /* ── Language bar ── */
+  .lang-bar{position:fixed;top:12px;right:16px;z-index:200;display:flex;align-items:center;gap:6px;font-size:12px;color:#888}
+  .lang-bar select{background:#1A1A2E;color:#E0E0E0;border:1px solid #2A2A2A;border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer}
+
+  /* ── Welcome overlay (always shown) ── */
+  #welcome-card{width:100%;max-width:460px;margin:0 auto}
+  .welcome-dots{display:flex;gap:8px;justify-content:center;margin-bottom:16px}
+  .welcome-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15);transition:all 0.3s;cursor:pointer}
+  .welcome-dot.active{background:#4FC3F7;transform:scale(1.4);box-shadow:0 0 8px rgba(79,195,247,0.4)}
+  .welcome-slide{display:none;flex-direction:column;align-items:center}
+  .welcome-slide.active{display:flex;animation:welcome-slide-in 0.35s ease}
+  @keyframes welcome-slide-in{from{opacity:0;transform:translateX(16px)}}
+  .welcome-icon-wrap{position:relative;width:140px;height:140px;margin:8px auto 16px;display:flex;align-items:center;justify-content:center}
+  .welcome-glow{position:absolute;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(79,195,247,0.3) 0%,transparent 70%);animation:welcome-glow-pulse 2.5s ease-in-out infinite}
+  .welcome-icon{width:88px;height:88px;border-radius:50%;position:relative;z-index:1;object-fit:contain;filter:drop-shadow(0 0 10px rgba(79,195,247,0.3))}
+  @keyframes welcome-glow-pulse{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.3);opacity:1}}
+  .welcome-title{font-size:22px;font-weight:700;color:#FFF;margin:0 0 4px;line-height:1.3;text-align:center}
+  .welcome-tagline{font-size:12.5px;color:#888;text-align:center;margin:0 0 16px}
+  .welcome-section{margin-bottom:14px;width:100%;text-align:left}
+  .welcome-section:last-child{margin-bottom:0}
+  .welcome-section h3{font-size:10.5px;font-weight:700;color:#4FC3F7;text-transform:uppercase;letter-spacing:1.5px;margin:0 0 5px}
+  .welcome-section p{font-size:12px;color:#B0B0B0;line-height:1.65;margin:0}
+  .welcome-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+  .welcome-step-num{width:22px;height:22px;border-radius:50%;background:rgba(79,195,247,0.15);color:#4FC3F7;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .welcome-step-text{font-size:12px;color:#B0B0B0;line-height:1.5;padding-top:2px}
+  .welcome-qr-wrap{margin:8px auto;text-align:center}
+  #welcome-qr-img{width:140px;height:140px;border-radius:12px;background:#FFF;padding:8px;box-shadow:0 4px 20px rgba(0,0,0,0.3);display:none}
+  .welcome-qr-label{display:block;font-size:11px;color:#888;margin-top:6px}
+  .welcome-nav{display:flex;gap:8px;margin-top:20px;align-items:center;justify-content:center;width:100%}
+  .welcome-btn{background:transparent;border:1px solid rgba(255,255,255,0.08);border-radius:6px;color:#FFF;font-size:9px;font-weight:600;padding:4px 10px;cursor:pointer;transition:all 0.15s;line-height:1}
+  .welcome-btn:active{transform:scale(0.95)}
+  .welcome-btn:disabled{opacity:0.2;cursor:default;pointer-events:none}
+  .welcome-btn.primary{background:rgba(79,195,247,0.12);border-color:rgba(79,195,247,0.25);color:#4FC3F7}
+  .welcome-btn.primary:hover{background:rgba(79,195,247,0.22)}
+
+  /* ── Server error banner ── */
+  #server-error-banner{display:none;position:fixed;bottom:0;left:0;right:0;background:#5C1A1A;border-top:1px solid #8B2A2A;padding:12px 20px;z-index:9999;flex-direction:row;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+  #server-error-banner.visible{display:flex}
+  .server-error-icon{font-size:16px}
+  .server-error-text{color:#FFB0B0;font-size:13px;text-align:center}
+  .server-error-detail{color:#CC8888;font-size:11px;width:100%;text-align:center}
+  .server-retry-btn{background:#4FC3F7;color:#000;border:none;border-radius:8px;padding:6px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .server-retry-btn:active{transform:scale(0.97)}
+  .server-retry-btn:disabled{opacity:0.5;cursor:default}
+
+  /* ── Retrying overlay ── */
+  #server-retrying{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;flex-direction:column;gap:16px}
+  #server-retrying.visible{display:flex}
+  .retrying-spinner{width:48px;height:48px;border:4px solid #2A2A2A;border-top-color:#4FC3F7;border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .retrying-text{color:#CCC;font-size:16px;font-weight:600}
+  .retrying-sub{color:#888;font-size:12px}
+</style>
+</head>
+<body>
+  <!-- Language bar -->
+  <div class="lang-bar">
+    <span data-i18n="welcome.lang_label">Language:</span>
+    <select id="lang-select" onchange="setWelcomeLang(this.value)">
+      <option value="en">English</option>
+      <option value="es">Espa&ntilde;ol</option>
+      <option value="pt">Portugu&ecirc;s</option>
+    </select>
+  </div>
+
+  <!-- Welcome overlay -->
+  <div id="welcome-card">
+    <div class="welcome-dots">
+      <span class="welcome-dot active" data-idx="0"></span>
+      <span class="welcome-dot" data-idx="1"></span>
+      <span class="welcome-dot" data-idx="2"></span>
+    </div>
+
+    <!-- Slide 0: Branding -->
+    <div class="welcome-slide active" data-slide="0">
+      <div class="welcome-icon-wrap">
+        <div class="welcome-glow"></div>
+        <svg class="welcome-icon" viewBox="0 0 88 88" fill="none"><circle cx="44" cy="44" r="40" fill="#1A1A2E" stroke="#4FC3F7" stroke-width="2"/><text x="44" y="54" text-anchor="middle" fill="#4FC3F7" font-size="32" font-weight="bold" font-family="system-ui">L</text></svg>
+      </div>
+      <h1 class="welcome-title" data-i18n="welcome.slide0_title">Your PC, under your total control.</h1>
+      <p class="welcome-tagline" data-i18n="welcome.slide0_tagline">Your mobile device. Your control console. Your ecosystem.</p>
+    </div>
+
+    <!-- Slide 1: Info -->
+    <div class="welcome-slide" data-slide="1">
+      <div class="welcome-section">
+        <h3 data-i18n="welcome.slide1_what_title">What is LunaDeck?</h3>
+        <p data-i18n="welcome.slide1_what_text">LunaDeck turns your mobile device into a high-performance remote control console for your PC.</p>
+      </div>
+      <div class="welcome-section">
+        <h3 data-i18n="welcome.slide1_why_title">What is it for?</h3>
+        <p data-i18n="welcome.slide1_why_intro">Forget complex shortcuts and constant alt-tabbing.</p>
+        <p><strong data-i18n="welcome.slide1_why_item1">Master Your Creativity:</strong></p>
+        <p><strong data-i18n="welcome.slide1_why_item2">Real-time Management:</strong></p>
+        <p><strong data-i18n="welcome.slide1_why_item3">Environmental Intelligence:</strong></p>
+      </div>
+    </div>
+
+    <!-- Slide 2: How to start -->
+    <div class="welcome-slide" data-slide="2">
+      <div class="welcome-section">
+        <h3 data-i18n="welcome.slide2_how_title">How to start?</h3>
+        <div class="welcome-step">
+          <span class="welcome-step-num">1</span>
+          <span class="welcome-step-text" data-i18n="welcome.slide2_step1">Open LunaDeck on your PC (you already did ✅)</span>
+        </div>
+        <div class="welcome-step">
+          <span class="welcome-step-num">2</span>
+          <span class="welcome-step-text" data-i18n="welcome.slide2_step2">Scan the QR code on your screen with your phone</span>
+        </div>
+        <div class="welcome-step">
+          <span class="welcome-step-num">3</span>
+          <span class="welcome-step-text" data-i18n="welcome.slide2_step3">Done! Access a fluid interface directly in your browser or install our native Android app.</span>
+        </div>
+      </div>
+      <div class="welcome-qr-wrap">
+        <img id="welcome-qr-img" src="" alt="QR">
+        <span class="welcome-qr-label" id="welcome-qr-label" data-i18n="welcome.slide2_qr_label">Connecting...</span>
+      </div>
+    </div>
+
+    <div class="welcome-nav">
+      <button class="welcome-btn" id="welcome-prev" disabled data-i18n="welcome.prev">&#x25C0; Previous</button>
+      <button class="welcome-btn primary" id="welcome-next" data-i18n="welcome.next">Next &#x25B6;</button>
+      <button class="welcome-btn primary" id="welcome-finish" style="display:none" data-i18n="welcome.finish">Start</button>
+    </div>
+  </div>
+
+  <!-- Server error banner -->
+  <div id="server-error-banner">
+    <span class="server-error-icon">&#x1F534;</span>
+    <span class="server-error-text" data-i18n="server.error_desc">Check your Firewall or port 9120.</span>
+    <span class="server-error-detail" id="server-error-detail">__ERROR_MSG__</span>
+    <button class="server-retry-btn" id="server-retry-btn" onclick="retryServer()" data-i18n="server.retry">Retry Connection</button>
+  </div>
+
+  <!-- Retrying overlay -->
+  <div id="server-retrying">
+    <div class="retrying-spinner"></div>
+    <span class="retrying-text" data-i18n="server.retrying">Connecting to server...</span>
+    <span class="retrying-sub" id="retrying-sub"></span>
+  </div>
+
+  <script>
+    var TRANS;
+    try {
+        TRANS = JSON.parse('{trans_escaped}');
+    } catch(e) {
+        TRANS = {};
+    }
+
+    var _currentLang = 'en';
+    var _slideIdx = 0;
+
+    function t(key) {
+      var m = TRANS[_currentLang];
+      return (m && m[key]) || key;
+    }
+
+    function applyTranslations() {
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var k = el.getAttribute('data-i18n');
+        var v = t(k);
+        if (v) el.textContent = v;
+      });
+    }
+
+    function setWelcomeLang(lang) {
+      _currentLang = lang;
+      localStorage.setItem('luna_lang', lang);
+      applyTranslations();
+    }
+
+    var _retryTimer = null;
+    var _retryCount = 0;
+    var _maxRetries = 60; // 30s max
+
+    function showServerError(msg) {
+      document.getElementById('server-retrying').classList.remove('visible');
+      document.getElementById('server-error-banner').classList.add('visible');
+      document.getElementById('server-error-detail').textContent = msg || '';
+    }
+
+    function hideServerError() {
+      document.getElementById('server-error-banner').classList.remove('visible');
+    }
+
+    function navigateToServer() {
+      if (typeof pywebview !== 'undefined' && pywebview.api && pywebview.api.retry_server) {
+        pywebview.api.retry_server().catch(function() {
+          window.location.href = 'http://127.0.0.1:9120/dashboard';
+        });
+      } else {
+        window.location.href = 'http://127.0.0.1:9120/dashboard';
+      }
+    }
+
+    function pollServer(callback) {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', 'http://127.0.0.1:9120/', true);
+      xhr.timeout = 2000;
+      xhr.onload = function() { callback(true); };
+      xhr.onerror = function() { callback(false); };
+      xhr.ontimeout = function() { callback(false); };
+      xhr.send();
+    }
+
+    function startServerWait() {
+      document.getElementById('server-error-banner').classList.remove('visible');
+      document.getElementById('server-retrying').classList.add('visible');
+      document.getElementById('retrying-sub').textContent = '';
+      _retryCount = 0;
+      if (_retryTimer) clearInterval(_retryTimer);
+      _retryTimer = setInterval(function() {
+        _retryCount++;
+        if (_retryCount > _maxRetries) {
+          clearInterval(_retryTimer);
+          _retryTimer = null;
+          showServerError('Server did not respond in time. Check firewall or port 9120.');
+          return;
+        }
+        document.getElementById('retrying-sub').textContent = 'Attempt ' + _retryCount + '...';
+        pollServer(function(ok) {
+          if (ok) {
+            clearInterval(_retryTimer);
+            _retryTimer = null;
+            navigateToServer();
+          }
+        });
+      }, 500);
+    }
+
+    function retryServer() {
+      startServerWait();
+    }
+
+    function onServerRetrying() {
+      startServerWait();
+    }
+
+    // Welcome slides
+    var slides = document.querySelectorAll('.welcome-slide');
+    var dots = document.querySelectorAll('.welcome-dot');
+    var prevBtn = document.getElementById('welcome-prev');
+    var nextBtn = document.getElementById('welcome-next');
+    var finishBtn = document.getElementById('welcome-finish');
+    var qrImg = document.getElementById('welcome-qr-img');
+    var qrLabel = document.getElementById('welcome-qr-label');
+
+    function goSlide(i) {
+      _slideIdx = i;
+      slides.forEach(function(s, idx) { s.classList.toggle('active', idx === i); });
+      dots.forEach(function(d, idx) { d.classList.toggle('active', idx === i); });
+      prevBtn.disabled = i === 0;
+      if (i === slides.length - 1) {
+        nextBtn.style.display = 'none';
+        finishBtn.style.display = '';
+      } else {
+        nextBtn.style.display = '';
+        finishBtn.style.display = 'none';
+      }
+    }
+
+    nextBtn.addEventListener('click', function() { if (_slideIdx < slides.length - 1) goSlide(_slideIdx + 1); });
+    prevBtn.addEventListener('click', function() { if (_slideIdx > 0) goSlide(_slideIdx - 1); });
+    dots.forEach(function(d, i) { d.addEventListener('click', function() { goSlide(i); }); });
+
+    finishBtn.addEventListener('click', function() {
+      localStorage.setItem('luna_welcome_shown', '1');
+      startServerWait();
+    });
+
+    // Init
+    (function() {
+      try {
+        if (localStorage.getItem('luna_welcome_shown') === '1') {
+          startServerWait();
+          return;
+        }
+        var saved = localStorage.getItem('luna_lang');
+        if (saved && ['en','es','pt'].includes(saved)) {
+          _currentLang = saved;
+          document.getElementById('lang-select').value = saved;
+        }
+        applyTranslations();
+        goSlide(0);
+      } catch(e) {
+        /* Silent fail */
+      }
+    })();
+  </script>
+</body>
+</html>

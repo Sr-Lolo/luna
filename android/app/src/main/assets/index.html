@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0D0D0D">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <link rel="icon" href="/icon-192.png" type="image/png">
+  <title>Luna</title>
+  <link rel="stylesheet" href="/style.css?v=1">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1><img src="/logo_isotipo.png" class="header-logo" alt=""> LUNA</h1>
+      <div id="mode-bar">
+        <button class="mode-btn mode-active" data-mode="grid"><img src="icons/keyboard.png" class="mode-btn-icon" alt="Teclado"></button>
+        <button class="mode-btn" data-mode="sliders"><img src="icons/sliders.png" class="mode-btn-icon" alt="Sliders"></button>
+      </div>
+      <div id="status-bar">
+        <span class="dot" id="dot"></span>
+        <span id="status-text">Conectando...</span>
+        <button class="auto-toggle active" id="auto-btn" title="Cambio autom\u00e1tico">A</button>
+        <button id="ui-toggle" class="ui-toggle-btn" title="Ocultar UI"><img src="icons/hide.png" class="ui-icon" alt="Ocultar UI"></button>
+        <a href="/dashboard" id="dash-link" style="display:none">&#x2699;</a>
+        <button id="rescan-qr-btn" class="rescan-qr-btn" style="display:none"><img src="icons/qr-scan.png" class="ui-icon" alt="Escanear QR"></button>
+      </div>
+    </header>
+    <script>(function(){if(navigator.userAgent.indexOf('LunaDesktop')>=0){document.documentElement.className='desktop';document.getElementById('dash-link').style.display=''}})()</script>
+
+    <div id="size-row" class="size-row">
+      <span class="size-label">&#x1F5B1;</span>
+      <input type="range" id="size-slider" class="size-slider" min="0" max="100" value="50">
+      <span class="size-label">&#x1F5A5;</span>
+    </div>
+
+    <div id="profile-bar" class="profile-hidden"></div>
+
+    <div id="preset-bar" class="preset-hidden"></div>
+
+    <main id="canvas" class="disconnected"></main>
+
+    <main id="sliders-canvas" class="disconnected hidden">
+      <div class="slider-card" id="card-volume">
+        <div class="slider-label">&#x1F50A; Volumen</div>
+        <div class="slider-value" id="volume-value">50%</div>
+        <input type="range" class="slider-input" id="slider-volume" min="0" max="255" value="128">
+      </div>
+      <div class="slider-card" id="card-brightness">
+        <div class="slider-label">&#x2600;&#xFE0F; Brillo</div>
+        <div class="slider-value" id="brightness-value">50%</div>
+        <input type="range" class="slider-input" id="slider-brightness" min="0" max="255" value="128">
+      </div>
+      <div class="slider-card scroll-card" id="card-scroll-v">
+        <div class="slider-label">&#x2195; Despl. V</div>
+        <div class="scroll-hint">Arrastra aqu&iacute;</div>
+        <div class="scroll-pad" id="scroll-pad-v">
+          <div class="scroll-thumb" id="scroll-thumb-v"></div>
+        </div>
+      </div>
+      <div class="slider-card scroll-card" id="card-scroll-h">
+        <div class="slider-label">&#x2194; Despl. H</div>
+        <div class="scroll-hint">Arrastra aqu&iacute;</div>
+        <div class="scroll-pad" id="scroll-pad-h">
+          <div class="scroll-thumb" id="scroll-thumb-h"></div>
+        </div>
+      </div>
+    </main>
+
+    <div id="conn-info">
+      <span id="conn-ip"></span>
+      <button id="conn-qr-btn" class="conn-qr-btn" title="Mostrar QR">&#x1F4F1;</button>
+    </div>
+
+  </div>
+
+  <button id="show-ui-btn" class="show-ui-btn">&#x1F441;</button>
+
+  <div id="toast" class="toast-hidden"></div>
+
+  <div id="apk-banner" class="apk-banner-hidden">
+    <div class="apk-banner-body">
+      <span class="apk-banner-icon">&#x1F4F1;</span>
+      <span class="apk-banner-text">&#xBF;Prefieres sin barra? Descarga la app <strong>Luna APK</strong></span>
+      <a class="apk-banner-link" href="https://sr-lolo.github.io/luna/" target="_blank">Descargar</a>
+      <button class="apk-banner-close" id="apk-banner-close">&times;</button>
+    </div>
+    <button class="apk-banner-tab" id="apk-banner-tab">&#x25B2;</button>
+  </div>
+
+  <div id="qr-modal" class="qr-modal-hidden">
+    <div class="qr-modal-content">
+      <img id="qr-img" src="" alt="QR">
+      <p id="qr-ip-label"></p>
+      <button id="qr-close-btn" class="qr-close-btn">&#x2716; Cerrar</button>
+    </div>
+  </div>
+
+  <script src="/app.js?v=1"></script>
+</body>
+</html>

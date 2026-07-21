@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0D0D0D">
+  <title>LunaDeck</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- ====== MAIN SCREEN ====== -->
+    <div class="slide active" id="slide-main">
+      <button class="lang-pill" id="btn-lang">ES</button>
+      <div class="main-content">
+        <h1 id="onb-title-main">VINCULA TU MOVIL A LA PC!!</h1>
+        <p id="onb-subtitle">Elige c&oacute;mo conectar tu dispositivo</p>
+        <div class="method-cards">
+          <div class="method-card" id="card-wifi" tabindex="0" role="button">
+            <div class="card-icon">&#x1F4F6;</div>
+            <div class="card-body">
+              <strong id="onb-card-wifi-title">Wi-Fi</strong>
+              <span id="onb-card-wifi-desc">Conexi&oacute;n inal&aacute;mbrica, misma red</span>
+            </div>
+            <div class="card-arrow">&rarr;</div>
+          </div>
+          <div class="method-card" id="card-usb" tabindex="0" role="button">
+            <div class="card-icon">&#x1F50C;</div>
+            <div class="card-body">
+              <strong id="onb-card-usb-title">USB</strong>
+              <span id="onb-card-usb-desc">Conexi&oacute;n por cable (USB Tethering)</span>
+            </div>
+            <div class="card-arrow">&rarr;</div>
+          </div>
+        </div>
+        <div id="slide-error" class="error-banner" style="display:none">
+          <span class="error-icon">&#x26A0;</span>
+          <span id="onb-error-text">Error de conexi&oacute;n</span>
+        </div>
+        <button class="retry-btn" id="btn-retry" style="display:none">
+          <span id="onb-retry">Reintentar conexi&oacute;n</span>
+        </button>
+      </div>
+      <div class="main-footer">
+        <button class="footer-link" id="link-scan"><span id="onb-scan">Escanear QR</span></button>
+        <span class="footer-dot">&middot;</span>
+        <button class="footer-link" id="link-manual"><span id="onb-manual">IP Manual</span></button>
+        <span class="footer-dot">&middot;</span>
+        <button class="footer-link" id="link-exit"><span id="onb-exit">Salir</span></button>
+      </div>
+    </div>
+
+    <!-- ====== WIFI INSTRUCTIONS ====== -->
+    <div class="slide" id="slide-wifi">
+      <div class="instr-header">
+        <button class="back-btn" id="back-wifi">&larr; <span id="onb-back">Volver</span></button>
+      </div>
+      <div class="instr-scroll">
+        <h2 id="onb-wifi-title">Conexi&oacute;n Wi-Fi</h2>
+        <p class="instr-sub" id="onb-wifi-sub">Sigue estos pasos para vincular tu m&oacute;vil por Wi-Fi:</p>
+        <div class="steps">
+          <div class="step"><span class="step-num">1</span><span class="step-text" id="onb-wifi-step1">Aseg&uacute;rate de que el PC y el m&oacute;vil est&eacute;n en la <strong>misma red Wi-Fi</strong></span></div>
+          <div class="step"><span class="step-num">2</span><span class="step-text" id="onb-wifi-step2">Abre <strong>LunaDeck</strong> en tu PC (el servidor debe estar ejecut&aacute;ndose)</span></div>
+          <div class="step"><span class="step-num">3</span><span class="step-text" id="onb-wifi-step3">En el panel del PC busca el <strong>c&oacute;digo de emparejamiento</strong> de 6 d&iacute;gitos</span></div>
+          <div class="step"><span class="step-num">4</span><span class="step-text" id="onb-wifi-step4">Pulsa <strong>"Buscar Wi-Fi"</strong> y selecciona tu PC de la lista</span></div>
+          <div class="step"><span class="step-num">5</span><span class="step-text" id="onb-wifi-step5">Introduce el <strong>c&oacute;digo de 6 d&iacute;gitos</strong> cuando se te solicite</span></div>
+        </div>
+        <button class="action-btn" id="btn-wifi-search"><span id="onb-wifi-btn">Buscar Wi-Fi</span></button>
+        <button class="panic-btn" id="panic-wifi"><span id="onb-panic">&#x2757; &iquest;No funciona?</span></button>
+      </div>
+    </div>
+
+    <!-- ====== USB INSTRUCTIONS ====== -->
+    <div class="slide" id="slide-usb">
+      <div class="instr-header">
+        <button class="back-btn" id="back-usb">&larr; <span id="onb-back-2">Volver</span></button>
+      </div>
+      <div class="instr-scroll">
+        <h2 id="onb-usb-title">Conexi&oacute;n USB</h2>
+        <p class="instr-sub" id="onb-usb-sub">Sigue estos pasos para vincular tu m&oacute;vil por USB:</p>
+        <div class="steps">
+          <div class="step"><span class="step-num">1</span><span class="step-text" id="onb-usb-step1">Conecta el m&oacute;vil al PC <strong>mediante un cable USB</strong></span></div>
+          <div class="step"><span class="step-num">2</span><span class="step-text" id="onb-usb-step2">Ve a <strong>Ajustes &gt; Redes &gt; Zona WiFi/Anclaje &gt; Anclaje USB</strong></span></div>
+          <div class="step"><span class="step-num">3</span><span class="step-text" id="onb-usb-step3">Activa <strong>"Anclaje USB"</strong> (USB Tethering)</span></div>
+          <div class="step"><span class="step-num">4</span><span class="step-text" id="onb-usb-step4">Pulsa <strong>"Buscar PC"</strong> para encontrar tu PC en la red USB</span></div>
+        </div>
+        <button class="action-btn" id="btn-usb-connect"><span id="onb-usb-btn">Buscar PC por USB</span></button>
+        <button class="panic-btn" id="panic-usb"><span id="onb-panic-2">&#x2757; &iquest;No funciona?</span></button>
+      </div>
+    </div>
+
+    <!-- ====== PANIC / HELP OVERLAY ====== -->
+    <div class="overlay" id="overlay-panic" style="display:none">
+      <div class="overlay-backdrop" id="overlay-backdrop"></div>
+      <div class="overlay-card">
+        <button class="overlay-close" id="overlay-close">&times;</button>
+        <div class="overlay-icon">&#x26A0;</div>
+        <h3 id="onb-panic-title">Soluci&oacute;n de problemas</h3>
+        <ul class="panic-list" id="panic-list">
+          <li><span class="panic-bullet">&bull;</span><span id="onb-panic-item">Causa posible</span></li>
+        </ul>
+        <button class="action-btn secondary" id="overlay-gotit"><span id="onb-panic-ok">Entendido</span></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

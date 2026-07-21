@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+         IgnorableNamespaces="uap rescap">
+  <Identity Name="SrLolo.LunaDeck" Publisher="CN=9E775FEF-50EC-4549-8B20-5951303467D1" Version="1.8.0.0" />
+  <Properties>
+    <DisplayName>LunaDeck</DisplayName>
+    <PublisherDisplayName>SrLolo</PublisherDisplayName>
+    <Description>Remote macro keyboard for Windows — controla tu PC desde tu móvil</Description>
+    <Logo>assets\StoreLogo.png</Logo>
+  </Properties>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+  <Resources>
+    <Resource Language="en-us" />
+    <Resource Language="es-es" />
+    <Resource Language="pt-br" />
+  </Resources>
+  <Capabilities>
+    <Capability Name="internetClient" />
+    <Capability Name="internetClientServer" />
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+  <Applications>
+    <Application Id="LunaDeck" Executable="Luna.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="LunaDeck"
+        Square150x150Logo="assets\Square150x150Logo.png"
+        Square44x44Logo="assets\Square44x44Logo.png"
+        Description="Remote macro keyboard"
+        BackgroundColor="#0D0D0D">
+        <uap:DefaultTile Square71x71Logo="assets\Square71x71Logo.png" Wide310x150Logo="assets\Wide310x150Logo.png" Square310x310Logo="assets\Square310x310Logo.png" />
+        <uap:SplashScreen Image="assets\SplashScreen.png" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+</Package>

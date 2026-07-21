@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0D0D0D">
+  <title>Luna — Ayuda</title>
+  <link rel="stylesheet" href="/style.css?v=4">
+  <script src="/lang/i18n.js"></script>
+  <script>(function(){if(navigator.userAgent.indexOf('LunaDesktop')>=0){document.documentElement.className='desktop';}}())</script>
+  <link rel="prefetch" href="https://sr-lolo.github.io/luna/ad_pc.html">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 30px; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; display: flex; height: 100vh; overflow: hidden; line-height: 1.7; font-size: 14px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    strong { color: var(--text-strong); font-weight: 700; }
+    code { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; padding: 1px 6px; font-size: 13px; color: var(--accent); }
+    kbd { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 1px 7px; font-size: 12px; font-family: inherit; color: var(--text-strong); box-shadow: inset 0 -1px 0 rgba(255,255,255,0.15); }
+    pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; overflow-x: auto; font-size: 13px; color: var(--accent); margin: 12px 0; line-height: 1.5; }
+
+    #help-sidebar { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; background: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 100; overflow-y: auto; flex-shrink: 0; }
+    #help-sidebar::-webkit-scrollbar { width: 4px; }
+    #help-sidebar::-webkit-scrollbar-track { background: transparent; }
+    #help-sidebar::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 2px; }
+    .sidebar-header { padding: 24px 20px 16px; border-bottom: 1px solid var(--border); }
+    .sidebar-header h2 { font-size: 18px; letter-spacing: 2px; color: var(--text-strong); }
+    .sidebar-header .sidebar-subtitle { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
+    .sidebar-nav { list-style: none; padding: 12px 0; flex: 1; }
+    .sidebar-nav li { margin: 0; }
+    .sidebar-nav a { display: block; padding: 8px 20px; font-size: 13px; color: var(--text-muted); border-left: 3px solid transparent; transition: all 0.15s; }
+    .sidebar-nav a:hover { color: var(--text-strong); background: rgba(255,255,255,0.03); text-decoration: none; }
+    .sidebar-nav a.active { color: var(--accent); border-left-color: var(--accent); background: rgba(0,229,255,0.06); }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+    .sidebar-footer .back-link { font-size: 12px; color: var(--text-dim); }
+
+    #help-content { margin-left: 260px; flex: 1; max-width: 820px; padding: 48px 56px 80px; height: 100vh; overflow-y: auto; }
+    #help-content::-webkit-scrollbar { width: 4px; }
+    #help-content::-webkit-scrollbar-track { background: transparent; }
+    #help-content::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+    .help-back-fixed { position: fixed; top: 16px; right: 24px; z-index: 50; background: var(--bg-surface); border: 1px solid var(--border-light); border-radius: 10px; padding: 8px 16px; color: var(--accent); font-size: 13px; font-weight: 600; text-decoration: none; transition: opacity 0.25s, transform 0.25s; }
+    .help-back-fixed:hover { border-color: var(--accent); transform: translateY(-1px); text-decoration: none; }
+    .help-back-fixed.scrolled { opacity: 0; transform: translateY(-12px); pointer-events: none; }
+
+    #help-jump { position: fixed; bottom: 24px; right: 24px; z-index: 200; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    #help-jump .jump-pill { display: flex; align-items: center; gap: 8px; background: var(--bg-surface); border: 1px solid var(--border-light); border-radius: 24px; padding: 8px 18px; color: var(--text-muted); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(12px); box-shadow: 0 4px 16px rgba(0,0,0,0.4); user-select: none; }
+    #help-jump .jump-pill:hover { border-color: var(--accent); color: var(--accent); }
+    #help-jump .jump-pill .jump-icon { font-size: 14px; }
+    #help-jump .jump-menu { display: none; flex-direction: column; background: var(--bg-surface); border: 1px solid var(--border-light); border-radius: 14px; padding: 6px; min-width: 180px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); animation: jump-fade-in 0.15s ease; }
+    #help-jump .jump-menu.open { display: flex; }
+    #help-jump .jump-menu a { display: block; padding: 8px 14px; border-radius: 8px; color: var(--text-muted); font-size: 13px; text-decoration: none; transition: all 0.12s; }
+    #help-jump .jump-menu a:hover { background: rgba(255,255,255,0.06); color: var(--accent); text-decoration: none; }
+    @keyframes jump-fade-in { from { opacity: 0; transform: translateY(8px) scale(0.95); } }
+    #help-content section { margin-bottom: 48px; }
+    #help-content h2 { font-size: 26px; color: var(--text-strong); margin-bottom: 6px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    #help-content h3 { font-size: 18px; color: var(--text-strong); margin-top: 24px; margin-bottom: 10px; }
+    #help-content h4 { font-size: 15px; color: var(--text-strong); margin-top: 18px; margin-bottom: 6px; }
+    #help-content p { margin-bottom: 12px; }
+    #help-content ul, #help-content ol { margin: 8px 0 16px 24px; }
+    #help-content li { margin-bottom: 6px; }
+    #help-content .tag { display: inline-block; background: var(--accent-bg); border: 1px solid var(--accent); border-radius: 12px; padding: 1px 12px; font-size: 11px; font-weight: 600; color: var(--accent); letter-spacing: 0.5px; }
+
+    .help-block { background: var(--bg-surface); border: 1px solid var(--border-light); border-radius: 14px; padding: 20px 24px; margin: 16px 0; }
+    .help-block.warn { border-left: 4px solid #ffa726; }
+    .help-block.info { border-left: 4px solid var(--accent); }
+    .help-block.tip { border-left: 4px solid #66bb6a; }
+    .help-block h4 { margin-top: 0; }
+
+    #help-content .support-card { background: linear-gradient(135deg, rgba(0,229,255,0.1), rgba(120,80,255,0.08)); border: 1px solid rgba(0,229,255,0.2); border-radius: 16px; padding: 32px; text-align: center; margin-top: 32px; }
+    #help-content .support-card h3 { margin-top: 0; font-size: 22px; }
+    #help-content .support-card .support-links { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin: 20px 0 12px; }
+    #help-content .support-card .support-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--bg-elevated); border: 1px solid var(--border-light); border-radius: 12px; padding: 12px 24px; color: var(--text-strong); font-size: 14px; font-weight: 600; transition: all 0.2s; }
+    #help-content .support-card .support-btn:hover { border-color: var(--accent); transform: translateY(-1px); text-decoration: none; }
+    #help-content .support-card .support-btn .heart { color: #ff4081; }
+
+    .faq-item { border-bottom: 1px solid var(--border); padding: 16px 0; }
+    .faq-item:last-child { border-bottom: none; }
+    .faq-q { font-weight: 700; color: var(--text-strong); cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+    .faq-q:hover { color: var(--accent); }
+    .faq-q .arrow { transition: transform 0.2s; font-size: 12px; color: var(--text-dim); }
+    .faq-q.open .arrow { transform: rotate(180deg); }
+    .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.3s ease, margin 0.3s ease; }
+    .faq-a.open { max-height: 600px; margin-top: 12px; }
+
+    @media (max-width: 768px) {
+      #help-sidebar { display: none; }
+      #help-content { margin-left: 0; padding: 24px 20px 60px; }
+      #help-content h2 { font-size: 22px; }
+    }
+
+    .sidebar-nav a[href="#que-es-luna"].active ~ .sidebar-nav a { border-left-color: transparent; }
+  </style>
+</head>
+<body>
+  <nav id="help-sidebar">
+    <div class="sidebar-header">
+      <h2 data-i18n="ayuda.sidebar_title">LUNA</h2>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+        <div class="sidebar-subtitle" data-i18n="ayuda.sidebar_subtitle">Documentaci&oacute;n</div>
+        <select id="lang-select" class="lang-select" data-i18n-tooltip="lang.tooltip" title="Change language" style="margin-left:auto;background:var(--bg-tertiary);border:1px solid var(--border-light);border-radius:6px;color:var(--text-muted);font-size:10px;padding:2px 4px;cursor:pointer;outline:none;"><option value="es">ES</option><option value="en">EN</option><option value="pt">PT</option></select>
+      </div>
+    </div>
+    <ul class="sidebar-nav">
+      <li><a href="#que-es-luna" data-i18n="ayuda.nav.que_es">¿Qu&eacute; es Luna?</a></li>
+      <li><a href="#conexion" data-i18n="ayuda.nav.conexion">Conexi&oacute;n</a></li>
+      <li><a href="#perfiles" data-i18n="ayuda.nav.perfiles">Perfiles</a></li>
+      <li><a href="#editor" data-i18n="ayuda.nav.editor">Editor de Teclas</a></li>
+      <li><a href="#avanzados" data-i18n="ayuda.nav.avanzados">Controles Avanzados</a></li>
+      <li><a href="#auto-switch" data-i18n="ayuda.nav.auto_switch">Auto-switch</a></li>
+      <li><a href="#apk-vs-web" data-i18n="ayuda.nav.apk_vs_web">APK vs Web</a></li>
+      <li><a href="#faq" data-i18n="ayuda.nav.faq">FAQ</a></li>
+      <li><a href="#soporte" data-i18n="ayuda.nav.soporte">Soporte</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a href="/dashboard" class="back-link" data-i18n="ayuda.back_panel">&larr; Volver al panel</a>
+    </div>
+  </nav>
+
+  <main id="help-content">
+    <a href="/dashboard" class="help-back-fixed" data-i18n="ayuda.back_fixed">&larr; Volver</a>
+
+    <!-- ─── 1. ¿QUÉ ES LUNA? ─── -->
+    <section id="que-es-luna">
+      <h2 data-i18n="ayuda.section1.title">¿Qu&eacute; es Luna?</h2>
+      <p data-i18n="ayuda.section1.p1"><strong>Luna</strong> es un sistema de control remoto que convierte tu tel&eacute;fono m&oacute;vil en un teclado inal&aacute;mbrico extendido para tu PC con Windows. A diferencia de soluciones gen&eacute;ricas (como aplicaciones de control remoto tradicionales), Luna procesa cada pulsaci&oacute;n de tecla de forma local en el ordenador a trav&eacute;s de un servidor <strong>FastAPI</strong>, ofreciendo una latencia pr&aacute;cticamente imperceptible independientemente de la velocidad de tu red Wi-Fi.</p>
+
+      <h3 data-i18n="ayuda.section1.arch_title">Arquitectura</h3>
+      <ol>
+        <li data-i18n="ayuda.section1.arch1">El m&oacute;vil env&iacute;a paquetes WebSocket binarios (<code>KeyCommand</code> o <code>SliderCommand</code>) al servidor en el PC.</li>
+        <li data-i18n="ayuda.section1.arch2">El servidor <strong>FastAPI</strong> recibe el paquete y lo deserializa mediante el protocolo interno (<code>protocol.py</code>).</li>
+        <li data-i18n="ayuda.section1.arch3">El <strong>keyboard_engine</strong> traduce el comando a una secuencia de eventos Win32 (<code>SendInput</code>, <code>keybd_event</code>).</li>
+        <li data-i18n="ayuda.section1.arch4">La tecla se ejecuta en la ventana activa del escritorio como si hubieras presionado f&iacute;sicamente el teclado.</li>
+      </ol>
+      <p data-i18n="ayuda.section1.arch_p">Todo el pipeline m&oacute;vil &rarr; PC ocurre en milisegundos. El audio local (MCI) y los sliders (volumen/brillo/scroll) se controlan mediante llamadas directas a Win32 API y <code>ctypes</code>, sin depender de servicios externos.</p>
+
+      <h3 data-i18n="ayuda.section1.use_cases_title">Casos de uso</h3>
+      <ul>
+        <li data-i18n="ayuda.section1.uc1"><strong>Edici&oacute;n de video / audio:</strong> Atajos de teclado complejos (Ctrl+Shift+S, Alt+F4, etc.) sin levantarte del sill&oacute;n.</li>
+        <li data-i18n="ayuda.section1.uc2"><strong>Gaming:</strong> Teclas programables para MMOs, binds r&aacute;pidos en shooters, o macros combinadas.</li>
+        <li data-i18n="ayuda.section1.uc3"><strong>Streaming (OBS):</strong> Cambia escenas, silencia micr&oacute;fono, lanza alertas con un solo toque desde el m&oacute;vil.</li>
+        <li data-i18n="ayuda.section1.uc4"><strong>Productividad:</strong> Perfiles específicos para Photoshop, VS Code, navegador, etc. con auto-cambio autom&aacute;tico de perfil.</li>
+      </ul>
+    </section>
+
+    <!-- ─── 2. CONEXIÓN ─── -->
+    <section id="conexion">
+      <h2 data-i18n="ayuda.section2.title">Conexi&oacute;n <span class="tag" data-i18n="ayuda.section2.tag">M&oacute;vil a PC</span></h2>
+      <p data-i18n="ayuda.section2.p1">Para que el m&oacute;vil y el PC se comuniquen, ambos deben estar conectados a la <strong>misma red Wi-Fi local</strong>. Luna no usa Internet en ning&uacute;n momento del intercambio de teclas; todo el tr&aacute;fico es interno (LAN).</p>
+
+      <h3 data-i18n="ayuda.section2.steps_title">Paso a paso</h3>
+      <ol>
+        <li data-i18n="ayuda.section2.step1"><strong>Ejecuta Luna.exe</strong> en tu PC con Windows. Se abrir&aacute; una ventana con un spinner de carga; en segundo plano se inicia el servidor HTTP/WebSocket en el puerto <code>9120</code>.</li>
+        <li data-i18n="ayuda.section2.step2"><strong>Espera a que la interfaz cargue</strong> (ver&aacute;s el panel de control con el logo de Luna).</li>
+        <li data-i18n="ayuda.section2.step3"><strong>En tu m&oacute;vil</strong>, abre un navegador (Chrome, Firefox, Edge) o la APK de Luna.</li>
+      </ol>
+
+      <h3 data-i18n="ayuda.section2.method_a">M&eacute;todo A: Esc&aacute;ner QR (recomendado)</h3>
+      <p data-i18n="ayuda.section2.method_a_p">En la barra de estado del PC ver&aacute;s un bot&oacute;n con icono de QR <code>[Escanear QR]</code>. Pulsa ese bot&oacute;n y escanea el c&oacute;digo con la c&aacute;mara de tu m&oacute;vil. El QR codifica la direcci&oacute;n <code>http://{ip}:9120</code> y te llevar&aacute; directo a la interfaz.</p>
+
+      <h3 data-i18n="ayuda.section2.method_b">M&eacute;todo B: Manual</h3>
+      <p data-i18n="ayuda.section2.method_b_p">Si tu m&oacute;vil no tiene c&aacute;mara o el QR no funciona, escribe directamente en el navegador:</p>
+      <pre data-i18n="ayuda.section2.method_b_code">http://192.168.x.x:9120</pre>
+      <p data-i18n="ayuda.section2.method_b_p2">Reemplaza <code>192.168.x.x</code> por la IP local de tu PC. Puedes verla en la ventana de Luna o abriendo <code>cmd &rarr; ipconfig</code> y buscando la <strong>Direcci&oacute;n IPv4</strong> de tu adaptador de red activo.</p>
+
+      <div class="help-block warn">
+        <h4 data-i18n="ayuda.section2.warn_title">Cortafuegos (Firewall de Windows)</h4>
+        <p data-i18n="ayuda.section2.warn_p">Si el m&oacute;vil no conecta, es posible que el firewall est&eacute; bloqueando el puerto 9120. Abre el <strong>Panel de Control &rarr; Firewall de Windows &rarr; Permitir una aplicaci&oacute;n o caracter&iacute;stica a trav&eacute;s del firewall</strong> y aseg&uacute;rate de que <code>Luna.exe</code> (o Python) tenga permisos en redes privadas. Tambi&eacute;n puedes desactivar temporalmente el firewall para confirmar.</p>
+      </div>
+
+      <div class="help-block info">
+        <h4 data-i18n="ayuda.section2.info_title">Red p&uacute;blica vs privada</h4>
+        <p data-i18n="ayuda.section2.info_p">Windows clasifica las redes Wi-Fi como "P&uacute;blicas" o "Privadas". En redes p&uacute;blicas (caf&eacute;s, bibliotecas) el firewall bloquea la comunicaci&oacute;n entre dispositivos por defecto. Cambia la red a <strong>Privada</strong> en <em>Configuraci&oacute;n &rarr; Wi-Fi &rarr; Propiedades de la red</em>.</p>
+      </div>
+    </section>
+
+    <!-- ─── 3. PERFILES ─── -->
+    <section id="perfiles">
+      <h2 data-i18n="ayuda.section3.title">Perfiles</h2>
+      <p data-i18n="ayuda.section3.p1">Un <strong>perfil</strong> es un conjunto de botones (atajos) agrupados bajo un nombre, pensado para un contexto o aplicaci&oacute;n espec&iacute;fica. Por ejemplo, puedes tener un perfil <em>"Photoshop"</em> con teclas para pinceles y capas, otro <em>"OBS"</em> para cambiar escenas, y otro <em>"Navegador"</em> para pesta&ntilde;as y marcadores.</p>
+
+      <h3 data-i18n="ayuda.section3.create_title">Crear un perfil</h3>
+      <ol>
+        <li data-i18n="ayuda.section3.create1">En el panel principal, haz clic en el bot&oacute;n <strong>"+"</strong> que aparece junto a los chips de perfil.</li>
+        <li data-i18n="ayuda.section3.create2">Ingresa un nombre &uacute;nico (m&aacute;x. 20 caracteres).</li>
+        <li data-i18n="ayuda.section3.create3">El nuevo perfil se crea con una cuadr&iacute;cula vac&iacute;a de 4&times;4 (16 botones).</li>
+      </ol>
+
+      <h3 data-i18n="ayuda.section3.edit_title">Editar un perfil</h3>
+      <p data-i18n="ayuda.section3.edit_p">La edici&oacute;n se realiza desde el <a href="/dashboard">Panel de control</a> (<code>/dashboard</code>). All&iacute; puedes:</p>
+      <ul>
+        <li data-i18n="ayuda.section3.edit1"><strong>Reordenar botones</strong> arrastr&aacute;ndolos a otra posici&oacute;n.</li>
+        <li data-i18n="ayuda.section3.edit2"><strong>Editar un bot&oacute;n</strong> haciendo clic en &eacute;l &rarr; se abre el editor con todos los campos (label, keyCode, modificadores, icono, sonido).</li>
+        <li data-i18n="ayuda.section3.edit3"><strong>Vaciar un bot&oacute;n</strong> con el bot&oacute;n "Restaurar perfil".</li>
+        <li data-i18n="ayuda.section3.edit4"><strong>Borrar el perfil</strong> (no se puede borrar "default").</li>
+      </ul>
+
+      <h3 data-i18n="ayuda.section3.switch_title">Cambiar entre perfiles</h3>
+      <p data-i18n="ayuda.section3.switch_p">En la interfaz principal, los perfiles aparecen como <strong>chips</strong> (p&aacute;ldoras) horizontales. Toca uno para activarlo. El perfil activo se marca con el color de acento (<span style="color:var(--accent)">cian</span>). Tambi&eacute;n puedes cambiar de perfil desde el m&oacute;vil.</p>
+    </section>
+
+    <!-- ─── 4. EDITOR DE TECLAS ─── -->
+    <section id="editor">
+      <h2 data-i18n="ayuda.section4.title">Editor de Teclas</h2>
+      <p data-i18n="ayuda.section4.p1">Cada bot&oacute;n de la cuadr&iacute;cula representa un atajo de teclado o una acci&oacute;n. Al hacer clic en un bot&oacute;n desde el panel de control se abre el editor con los siguientes campos:</p>
+
+      <h3 data-i18n="ayuda.section4.label_title">Label <span class="tag" data-i18n="ayuda.section4.label_tag">Etiqueta</span></h3>
+      <p data-i18n="ayuda.section4.label_p">Texto visible que se muestra en el bot&oacute;n. M&aacute;ximo 8 caracteres para que no se desborde. Ejemplos: <code>"Guardar"</code>, <code>"Copiar"</code>, <code>"SS"</code>.</p>
+
+      <h3 data-i18n="ayuda.section4.keycode_title">KeyCode y Modificadores <span class="tag" data-i18n="ayuda.section4.keycode_tag">Atajo</span></h3>
+      <p data-i18n="ayuda.section4.keycode_p">Define qu&eacute; tecla se presiona y con qu&eacute; modificadores (Ctrl, Alt, Shift, Win).</p>
+      <ul>
+        <li data-i18n="ayuda.section4.keycode1"><strong>KeyCode:</strong> C&oacute;digo num&eacute;rico de la tecla seg&uacute;n la tabla de c&oacute;digos virtuales de Windows (Virtual-Key Codes). Puedes escribir directamente el n&uacute;mero (ej. <code>83</code> = tecla S) o seleccionar desde el men&uacute; desplegable.</li>
+        <li data-i18n="ayuda.section4.keycode2"><strong>Modificadores:</strong> Selecciona uno o varios (Ctrl, Alt, Shift, Win). El valor se almacena como un bitmask que el servidor interpreta para generar la combinaci&oacute;n exacta. Ejemplo: <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> se representa como KeyCode <code>83</code> con modificadores <code>Ctrl|Shift</code>.</li>
+      </ul>
+      <p data-i18n="ayuda.section4.keycode_hold">Para teclas sin modificadores, el APK usa el comportamiento <strong>multi-touch + hold</strong>: mant&eacute;n presionado para hold, toca r&aacute;pido para pulsaci&oacute;n &uacute;nica. Las teclas con modificadores siempre se ejecutan al tocar (tap).</p>
+
+      <h3 data-i18n="ayuda.section4.icon_title">Iconos <span class="tag" data-i18n="ayuda.section4.icon_tag">Im&aacute;genes</span></h3>
+      <p data-i18n="ayuda.section4.icon_p">Puedes asignar una imagen PNG, JPG o GIF (m&aacute;x. 5 MB) para que aparezca dentro del bot&oacute;n. Los iconos se suben al servidor mediante el endpoint <code>/api/upload-icon</code> y se almacenan en la carpeta <code>custom_icons</code> del directorio de datos. Un icono bien elegido acelera el reconocimiento visual del atajo.</p>
+
+      <h3 data-i18n="ayuda.section4.sound_title">Sonidos <span class="tag" data-i18n="ayuda.section4.sound_tag">MCI Engine</span></h3>
+      <p data-i18n="ayuda.section4.sound_p">Luna puede reproducir un archivo de audio local (WAV o MP3) en el PC cuando presionas un bot&oacute;n. Esto usa el motor <strong>MCI (Media Control Interface)</strong> de Windows a trav&eacute;s de <code>ctypes.windll.winmm.mciSendStringW</code>.</p>
+      <ul>
+        <li data-i18n="ayuda.section4.sound1"><strong>Multicapa:</strong> Cada sonido se reproduce en un canal independiente (alias <code>luna_0</code> a <code>luna_15</code>). Puedes superponer hasta 16 sonidos simult&aacute;neamente sin que se corten entre s&iacute;.</li>
+        <li data-i18n="ayuda.section4.sound2"><strong>Sin bloquear:</strong> La reproducci&oacute;n se lanza en un hilo separado (<code>daemon=True</code>), por lo que no interfiere con la recepci&oacute;n de comandos.</li>
+      </ul>
+
+      <div class="help-block tip">
+        <h4 data-i18n="ayuda.section4.tip_title">Consejo: sonidos de feedback</h4>
+        <p data-i18n="ayuda.section4.tip_p">Asigna un sonido corto (ej. <code>click.wav</code>) a los botones cr&iacute;ticos para tener confirmaci&oacute;n auditiva de que la tecla se ejecut&oacute;. Esto es especialmente &uacute;til cuando el m&oacute;vil est&aacute; fuera de tu campo de visi&oacute;n.</p>
+      </div>
+    </section>
+
+    <!-- ─── 5. CONTROLES AVANZADOS ─── -->
+    <section id="avanzados">
+      <h2 data-i18n="ayuda.section5.title">Controles Avanzados</h2>
+
+      <h3 data-i18n="ayuda.section5.sliders_title">Sliders (Deslizadores Virtuales)</h3>
+      <p data-i18n="ayuda.section5.sliders_p">Luna incluye un slider t&aacute;ctil que puedes configurar para controlar diferentes par&aacute;metros del sistema. Al activar el modo <strong>Sliders</strong> (icono de sliders en la barra de modo), la cuadr&iacute;cula de teclas se reemplaza por un control deslizante horizontal.</p>
+      <ul>
+        <li data-i18n="ayuda.section5.slider1"><strong>Volumen del sistema:</strong> Ajusta el volumen maestro de Windows (0-100%). Usa la API <code>win32api</code> para modificar el nivel del mixer de audio.</li>
+        <li data-i18n="ayuda.section5.slider2"><strong>Brillo de pantalla:</strong> Controla el brillo del monitor mediante WMI (clase <code>WmiMonitorBrightnessMethods</code>). Solo funciona en monitores internos (port&aacute;tiles).</li>
+        <li data-i18n="ayuda.section5.slider3"><strong>Scroll horizontal:</strong> Emula eventos de rueda de desplazamiento horizontal (<code>WM_MOUSEHWHEEL</code>).</li>
+        <li data-i18n="ayuda.section5.slider4"><strong>Scroll vertical:</strong> Emula la rueda del rat&oacute;n est&aacute;ndar.</li>
+      </ul>
+      <p data-i18n="ayuda.section5.sliders_note">Puedes cambiar la funci&oacute;n del slider desde el men&uacute; de selecci&oacute;n que aparece en la parte superior del panel de sliders.</p>
+
+      <h3 data-i18n="ayuda.section5.hold_title">Hold (Tecla Mantenida)</h3>
+      <p data-i18n="ayuda.section5.hold_p">El comportamiento <strong>Hold</strong> permite mantener una tecla presionada de forma continuada sin tener que sostener el dedo sobre el bot&oacute;n. Es &uacute;til para:</p>
+      <ul>
+        <li data-i18n="ayuda.section5.hold1">Desplazamiento continuo (flechas arriba/abajo).</li>
+        <li data-i18n="ayuda.section5.hold2">Repetici&oacute;n de caracteres (backspace, espacio).</li>
+        <li data-i18n="ayuda.section5.hold3">Juegos que requieren mantener presionada una tecla (acelerar, caminar).</li>
+      </ul>
+      <p data-i18n="ayuda.section5.hold_note">En el APK, las teclas <strong>sin modificadores</strong> usan multi-touch + hold: toca r&aacute;pido para pulsaci&oacute;n &uacute;nica, mant&eacute;n presionado para activar hold. Un indicador visual en el bot&oacute;n muestra si el hold est&aacute; activo.</p>
+    </section>
+
+    <!-- ─── 6. AUTO-SWITCH ─── -->
+    <section id="auto-switch">
+      <h2 data-i18n="ayuda.section6.title">Auto-switch <span class="tag" data-i18n="ayuda.section6.tag">Cambio Inteligente</span></h2>
+      <p data-i18n="ayuda.section6.p1">El <strong>auto-switch</strong> permite que Luna detecte autom&aacute;ticamente qu&eacute; ventana est&aacute; activa en tu PC y cambie el perfil del m&oacute;vil al correspondiente, sin que tengas que tocarlo.</p>
+
+      <h3 data-i18n="ayuda.section6.how_title">C&oacute;mo funciona</h3>
+      <p data-i18n="ayuda.section6.how_p">El componente <code>WindowTracker</code> ejecuta un bucle en segundo plano que consulta la ventana activa del escritorio cada <strong>500 ms</strong> mediante la API <code>GetForegroundWindow</code> de Win32. Cuando detecta que el t&iacute;tulo o el ejecutable de la ventana activa coincide con un perfil configurado, env&iacute;a un mensaje <code>switch_profile</code> a trav&eacute;s del WebSocket al m&oacute;vil.</p>
+
+      <h3 data-i18n="ayuda.section6.config_title">Configuraci&oacute;n</h3>
+      <p data-i18n="ayuda.section6.config_p">En el panel de control (<code>/dashboard</code>), puedes asociar un perfil a un ejecutable espec&iacute;fico:</p>
+      <ol>
+        <li data-i18n="ayuda.section6.config1">Abre la secci&oacute;n de <strong>Auto-switch</strong>.</li>
+        <li data-i18n="ayuda.section6.config2">Selecciona el perfil que quieres asignar.</li>
+        <li data-i18n="ayuda.section6.config3">Busca el ejecutable de la aplicaci&oacute;n (ej. <code>photoshop.exe</code>, <code>code.exe</code>, <code>chrome.exe</code>).</li>
+        <li data-i18n="ayuda.section6.config4">Guarda la configuraci&oacute;n.</li>
+      </ol>
+      <p data-i18n="ayuda.section6.config_note">Cuando el foco cambie a esa aplicaci&oacute;n, el m&oacute;vil cambiar&aacute; autom&aacute;ticamente al perfil que le asignaste. Si la ventana activa no coincide con ning&uacute;n perfil configurado, se mantiene el perfil actual.</p>
+
+      <div class="help-block info">
+        <h4 data-i18n="ayuda.section6.perf_title">Rendimiento</h4>
+        <p data-i18n="ayuda.section6.perf_p">La consulta cada 500 ms es ligera (una llamada a <code>GetForegroundWindow</code> + lectura del t&iacute;tulo). No afecta al rendimiento del sistema ni al consumo de bater&iacute;a. Cuando no hay ning&uacute;n m&oacute;vil conectado, el tracker se pausa autom&aacute;ticamente.</p>
+      </div>
+    </section>
+
+    <!-- ─── 7. APK VS WEB ─── -->
+    <section id="apk-vs-web">
+      <h2 data-i18n="ayuda.section7.title">APK vs Web</h2>
+      <p data-i18n="ayuda.section7.p1">Luna se puede usar desde cualquier navegador moderno en el m&oacute;vil, pero la <strong>APK de Luna</strong> ofrece ventajas significativas para el uso diario. Aqu&iacute; tienes una comparaci&oacute;n detallada:</p>
+
+      <div class="help-block" style="border-left:4px solid var(--accent)">
+        <h4 data-i18n="ayuda.section7.apk_title">APK de Luna (Recomendada)</h4>
+        <ul>
+          <li data-i18n="ayuda.section7.apk1"><strong>Pantalla completa:</strong> Sin barra de direcciones, sin chrome del navegador. La UI ocupa todo el espacio disponible.</li>
+          <li data-i18n="ayuda.section7.apk2"><strong>Wake lock:</strong> La pantalla del m&oacute;vil no se apaga mientras usas Luna. No necesitas tocar la pantalla cada N segundos para mantenerla encendida.</li>
+          <li data-i18n="ayuda.section7.apk3"><strong>Esc&aacute;ner QR nativo:</strong> Escanea el c&oacute;digo QR directamente desde la app, sin aplicaciones de terceros.</li>
+          <li data-i18n="ayuda.section7.apk4"><strong>Navegaci&oacute;n pulida:</strong> El bot&oacute;n de retroceso de Android se integra con la UI, permitiendo ocultar/mostrar la interfaz sin recargar.</li>
+          <li data-i18n="ayuda.section7.apk5"><strong>Actualizaciones autom&aacute;ticas:</strong> La APK verifica peri&oacute;dicamente si hay una nueva versi&oacute;n en GitHub y te ofrece descargarla e instalarla con un solo clic.</li>
+        </ul>
+      </div>
+
+      <div class="help-block" style="border-left:4px solid var(--text-dim)">
+        <h4 data-i18n="ayuda.section7.web_title">Versi&oacute;n Web (Navegador)</h4>
+        <ul>
+          <li data-i18n="ayuda.section7.web1"><strong>Sin instalaci&oacute;n:</strong> Abres el navegador, escribes la URL y ya est&aacute;s usando Luna. Ideal para una prueba r&aacute;pida o si usas Luna espor&aacute;dicamente.</li>
+          <li data-i18n="ayuda.section7.web2"><strong>Cross-platform:</strong> Funciona en iOS, Android, o cualquier dispositivo con un navegador moderno.</li>
+          <li data-i18n="ayuda.section7.web3"><strong>Limitaciones:</strong> La pantalla se apaga por el timeout del sistema, la barra de direcciones ocupa espacio valioso, y no hay esc&aacute;ner QR integrado.</li>
+        </ul>
+      </div>
+
+      <p data-i18n="ayuda.section7.recommendation"><strong>Recomendaci&oacute;n:</strong> Usa la versi&oacute;n web para probar Luna los primeros minutos. Si te gusta, instala la APK para una experiencia mucho m&aacute;s fluida y profesional. Puedes descargarla desde <a href="https://sr-lolo.github.io/luna/" target="_blank">sr-lolo.github.io/luna</a>.</p>
+    </section>
+
+    <!-- ─── 8. FAQ ─── -->
+    <section id="faq">
+      <h2 data-i18n="ayuda.section8.title">FAQ <span class="tag" data-i18n="ayuda.section8.tag">Soluci&oacute;n de problemas</span></h2>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)"><span data-i18n="ayuda.section8.q1">¿Por qu&eacute; no conecta mi m&oacute;vil al PC?</span><span class="arrow">&#x25BC;</span></div>
+        <div class="faq-a">
+          <p data-i18n="ayuda.section8.a1_intro">Las causas m&aacute;s comunes son:</p>
+          <ul>
+            <li data-i18n="ayuda.section8.a1_1"><strong>Firewall bloqueando el puerto 9120:</strong> Aseg&uacute;rate de que <code>Luna.exe</code> o Python tengan permiso en redes privadas desde el Firewall de Windows.</li>
+            <li data-i18n="ayuda.section8.a1_2"><strong>Red p&uacute;blica:</strong> Windows bloquea la comunicaci&oacute;n entre dispositivos en redes p&uacute;blicas. Cambia la red a "Privada" en Configuraci&oacute;n &rarr; Wi-Fi &rarr; Propiedades.</li>
+            <li data-i18n="ayuda.section8.a1_3"><strong>Misma red:</strong> Verifica que ambos dispositivos est&eacute;n conectados al mismo router y a la misma banda (2.4 GHz o 5 GHz). Algunos routers a&iacute;slan clientes en la banda de 5 GHz.</li>
+            <li data-i18n="ayuda.section8.a1_4"><strong>IP incorrecta:</strong> Revisa la IP que muestra la ventana de Luna. Si cambia con frecuencia, configura una IP fija en tu PC desde el router o desde Propiedades de red.</li>
+          </ul>
+          <p data-i18n="ayuda.section8.a1_final">Si todo lo anterior est&aacute; correcto, prueba acceder desde el navegador del PC a <code>http://127.0.0.1:9120</code>. Si no carga, el servidor no se inici&oacute; correctamente.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)"><span data-i18n="ayuda.section8.q2">¿Por qu&eacute; no se escucha el sonido al presionar un bot&oacute;n?</span><span class="arrow">&#x25BC;</span></div>
+        <div class="faq-a">
+          <p data-i18n="ayuda.section8.a2_intro">El sonido se reproduce en el PC, no en el m&oacute;vil. Revisa lo siguiente:</p>
+          <ul>
+            <li data-i18n="ayuda.section8.a2_1"><strong>Archivo de audio:</strong> Aseg&uacute;rate de que el archivo WAV o MP3 se subi&oacute; correctamente al servidor (desde el editor de teclas en el panel de control).</li>
+            <li data-i18n="ayuda.section8.a2_2"><strong>Formato soportado:</strong> Solo WAV y MP3. El servidor rechaza otros formatos con un error 400.</li>
+            <li data-i18n="ayuda.section8.a2_3"><strong>Bocinas del PC:</strong> Verifica que el volumen del PC no est&eacute; en silencio o demasiado bajo.</li>
+            <li data-i18n="ayuda.section8.a2_4"><strong>MCI ocupado:</strong> El motor MCI tiene 16 canales disponibles. Si superas ese l&iacute;mite simult&aacute;neo, los sonidos adicionales se ignoran silenciosamente.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)"><span data-i18n="ayuda.section8.q3">¿C&oacute;mo minimizo Luna sin cerrarlo?</span><span class="arrow">&#x25BC;</span></div>
+        <div class="faq-a">
+          <p data-i18n="ayuda.section8.a3_intro">Luna puede ejecutarse en <strong>segundo plano</strong> (bandeja del sistema) mientras el servidor sigue activo para el m&oacute;vil.</p>
+          <ol>
+            <li data-i18n="ayuda.section8.a3_1">Presiona la <strong>X</strong> de la ventana de Luna.</li>
+            <li data-i18n="ayuda.section8.a3_2">En el di&aacute;logo que aparece, selecciona <strong>"Segundo plano"</strong>.</li>
+            <li data-i18n="ayuda.section8.a3_3">La ventana se oculta y aparece un icono en la bandeja del sistema (junto al reloj de Windows).</li>
+            <li data-i18n="ayuda.section8.a3_4">Para restaurar la ventana, haz doble clic en el icono de la bandeja.</li>
+            <li data-i18n="ayuda.section8.a3_5">Para cerrar Luna completamente, haz clic derecho en el icono y selecciona "Salir", o presiona la X y elige "Cerrar completamente".</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)"><span data-i18n="ayuda.section8.q4">Los perfiles no aparecen o no se guardan los cambios</span><span class="arrow">&#x25BC;</span></div>
+        <div class="faq-a">
+          <p data-i18n="ayuda.section8.a4_intro">La configuraci&oacute;n de perfiles se almacena en un archivo JSON en el directorio de datos de Luna. Si los cambios no persisten:</p>
+          <ul>
+            <li data-i18n="ayuda.section8.a4_1"><strong>Permisos de escritura:</strong> Aseg&uacute;rate de que el usuario de Windows tenga permisos de escritura en el directorio donde est&aacute; instalado Luna.</li>
+            <li data-i18n="ayuda.section8.a4_2"><strong>Archivo corrupto:</strong> Si el JSON se da&ntilde;&oacute;, puedes restaurar la configuraci&oacute;n por defecto desde el panel de control (bot&oacute;n "Restaurar perfil").</li>
+            <li data-i18n="ayuda.section8.a4_3"><strong>Doble instancia:</strong> Luna bloquea la ejecuci&oacute;n de m&uacute;ltiples instancias. Si dos instancias escriben simult&aacute;neamente, los datos pueden sobrescribirse.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── 9. SOPORTE ─── -->
+    <section id="soporte">
+      <div class="support-card">
+        <h3 data-i18n="ayuda.section9.card_title">&#x2764; Apoya el desarrollo</h3>
+        <p data-i18n="ayuda.section9.card_p">Luna es un proyecto independiente mantenido en mi tiempo libre. Si te resulta &uacute;til, considera invitarme un caf&eacute; para ayudar a cubrir los costos de desarrollo, servidores y pruebas.</p>
+        <div class="support-links">
+          <a href="https://ko-fi.com/srlolo" target="_blank" class="support-btn"><span class="heart">&#x2665;</span> <span data-i18n="ayuda.section9.coffee">Inv&iacute;tame un caf&eacute;</span></a>
+          <a href="mailto:lozanoeduard483+lunadeck_support@gmail.com" class="support-btn">&#x2709; lunadeck_support@gmail.com</a>
+        </div>
+        <p style="margin-top:16px;font-size:13px;color:var(--text-dim)" data-i18n="ayuda.section9.footer">
+          Reporta bugs o sugiere mejoras en 
+          <a href="https://github.com/Sr-Lolo/luna/issues" target="_blank">GitHub Issues</a> 
+          o escribiendo al correo de soporte. Toda retroalimentaci&oacute;n es bienvenida.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="help-jump">
+    <div class="jump-menu" id="jump-menu"></div>
+    <div class="jump-pill" id="jump-pill">
+      <span class="jump-icon">&#x25B2;</span>
+      <span id="jump-label" data-i18n="ayuda.jump_label">Saltar a...</span>
+    </div>
+  </div>
+
+  <script>
+    function muestrarDialogoCierre() {
+      var old = document.getElementById('luna-close-dialog');
+      if (old) return;
+      var overlay = document.createElement('div');
+      overlay.id = 'luna-close-dialog';
+      overlay.className = 'luna-close-overlay';
+      var card = document.createElement('div');
+      card.className = 'luna-close-card';
+      card.innerHTML =
+        '<div class="luna-close-title">' + __('close_dialog.title') + '</div>' +
+        '<div class="luna-close-desc">' + __('close_dialog.desc') + '</div>' +
+        '<div class="luna-close-buttons">' +
+        '<button class="luna-close-btn luna-close-primary" onclick="cerrarSegundoPlano()">' + __('close_dialog.background') + '</button>' +
+        '<button class="luna-close-btn luna-close-danger" onclick="cerrarCompletamente()">' + __('close_dialog.close') + '</button>' +
+        '<button class="luna-close-btn luna-close-cancel" onclick="cancelarCierre()">' + __('close_dialog.cancel') + '</button>' +
+        '</div>';
+      overlay.appendChild(card);
+      document.body.appendChild(overlay);
+      requestAnimationFrame(function() {
+        overlay.classList.add('visible');
+      });
+    }
+    function cerrarCompletamente() {
+      var el = document.getElementById('luna-close-dialog');
+      if (el) el.remove();
+      if (typeof pywebview !== 'undefined' && pywebview.api && pywebview.api.close_completly) {
+        pywebview.api.close_completly();
+      }
+    }
+    function cerrarSegundoPlano() {
+      var el = document.getElementById('luna-close-dialog');
+      if (el) el.remove();
+      if (typeof pywebview !== 'undefined' && pywebview.api && pywebview.api.hide_to_tray) {
+        pywebview.api.hide_to_tray();
+      }
+    }
+    function cancelarCierre() {
+      var el = document.getElementById('luna-close-dialog');
+      if (el) el.remove();
+      if (typeof pywebview !== 'undefined' && pywebview.api && pywebview.api.cancel_close) {
+        pywebview.api.cancel_close();
+      }
+    }
+
+    (function(){
+      setInterval(function() {
+        if (typeof pywebview !== 'undefined' && pywebview.api && pywebview.api.is_close_pending) {
+          pywebview.api.is_close_pending().then(function(pending) {
+            if (pending) muestrarDialogoCierre();
+          });
+        }
+      }, 300);
+    })();
+
+    (function(){document.documentElement.setAttribute('data-theme','dark');var ls=document.getElementById('lang-select');if(ls){var l=localStorage.getItem('luna_lang')||'';if(l)ls.value=l;ls.onchange=function(){setLanguage(this.value)}}})();
+
+    function toggleFaq(el) {
+      el.classList.toggle('open');
+      var answer = el.nextElementSibling;
+      answer.classList.toggle('open');
+    }
+
+    function getSectionLabel(id) {
+      var map = {
+        'que-es-luna': __('ayuda.nav.que_es'),
+        'conexion': __('ayuda.nav.conexion'),
+        'perfiles': __('ayuda.nav.perfiles'),
+        'editor': __('ayuda.nav.editor'),
+        'avanzados': __('ayuda.nav.avanzados'),
+        'auto-switch': __('ayuda.nav.auto_switch'),
+        'apk-vs-web': __('ayuda.nav.apk_vs_web'),
+        'faq': __('ayuda.nav.faq'),
+        'soporte': __('ayuda.nav.soporte')
+      };
+      return map[id] || id;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var content = document.getElementById('help-content');
+      var sections = document.querySelectorAll('#help-content section');
+      var links = document.querySelectorAll('.sidebar-nav a');
+      var jumpLabel = document.getElementById('jump-label');
+      var jumpMenu = document.getElementById('jump-menu');
+      var jumpPill = document.getElementById('jump-pill');
+      var backBtn = document.querySelector('.help-back-fixed');
+      if (!sections.length || !links.length) return;
+
+      jumpPill.addEventListener('click', function(e) {
+        e.stopPropagation();
+        jumpMenu.classList.toggle('open');
+      });
+      document.addEventListener('click', function() {
+        jumpMenu.classList.remove('open');
+      });
+
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            var id = entry.target.id;
+            links.forEach(function(link) {
+              link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+            });
+            jumpLabel.textContent = getSectionLabel(id);
+          }
+        });
+      }, { rootMargin: '-40% 0px -55% 0px' });
+
+      sections.forEach(function(s) { observer.observe(s); });
+
+      sections.forEach(function(s) {
+        var a = document.createElement('a');
+        a.href = '#' + s.id;
+        a.textContent = getSectionLabel(s.id);
+        a.addEventListener('click', function() {
+          jumpMenu.classList.remove('open');
+        });
+        jumpMenu.appendChild(a);
+      });
+
+      if (content) {
+        content.addEventListener('scroll', function() {
+          if (backBtn) {
+            backBtn.classList.toggle('scrolled', content.scrollTop > 60);
+          }
+        });
+      }
+    });
+  </script>
+
+  <div id="ad-banner" class="ad-banner ad-banner-hidden">
+    <iframe id="ad-frame" class="ad-frame" frameborder="0" scrolling="no" allow="autoplay" referrerpolicy="no-referrer"></iframe>
+  </div>
+  <script>
+  (function(){
+    var banner = document.getElementById('ad-banner');
+    var frame = document.getElementById('ad-frame');
+    if (!banner || !frame) return;
+    if (!document.documentElement.classList.contains('desktop')) return;
+    fetch('/api/pro-status')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.pro) return;
+        banner.classList.remove('ad-banner-hidden');
+        frame.src = 'https://sr-lolo.github.io/luna/ad_pc.html';
+        document.body.style.paddingBottom = '60px';
+      })
+      .catch(function(e) { console.warn('Ad pro-status fetch failed:', e); });
+  })();
+  </script>
+</body>
+</html>

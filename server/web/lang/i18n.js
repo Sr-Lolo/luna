@@ -1,0 +1,10 @@
+(function(){'use strict';var SK='luna_lang',FL='en',lang=FL,tr={};function detect(){var s=localStorage.getItem(SK);if(s&&['es','en','pt'].includes(s))return s;var n=(navigator.language||navigator.userLanguage||'').split('-')[0];if(['en','pt'].includes(n))return n;return FL}
+function load(l){lang=l;return fetch('/lang/'+l+'.json').then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}).then(function(d){tr=d;apply();document.dispatchEvent(new CustomEvent('l10n-ready',{detail:{lang:l}}))}).catch(function(){if(l!==FL)return load(FL);if(l!=='es')return load('es');apply()})}
+function apply(){document.querySelectorAll('[data-i18n]').forEach(function(el){var k=el.getAttribute('data-i18n'),t=get(k);if(t){if(el.tagName==='OPTGROUP'){el.label=t}else{el.textContent=t}}});
+document.querySelectorAll('[data-i18n-tooltip]').forEach(function(el){var k=el.getAttribute('data-i18n-tooltip'),t=get(k);if(t){if(el.hasAttribute('data-tooltip'))el.setAttribute('data-tooltip',t);el.title=t}});
+document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el){var k=el.getAttribute('data-i18n-placeholder'),t=get(k);if(t)el.placeholder=t});
+document.querySelectorAll('[data-i18n-alt]').forEach(function(el){var k=el.getAttribute('data-i18n-alt'),t=get(k);if(t)el.alt=t});
+document.querySelectorAll('[data-i18n-title]').forEach(function(el){var k=el.getAttribute('data-i18n-title'),t=get(k);if(t)el.title=t});
+document.querySelectorAll('[data-i18n-value]').forEach(function(el){var k=el.getAttribute('data-i18n-value'),t=get(k);if(t)el.value=t})}
+function get(k){var t=tr[k];if(t===undefined||t===null){console.warn('i18n: missing key',k);return k}return t}
+window.__=function(k){var t=get(k);return t};window.setLanguage=function(l){localStorage.setItem(SK,l);location.reload()};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){load(detect())});else load(detect())})();

@@ -1,0 +1,27 @@
+# Built binaries
+dist/
+*.apk
+!docs/Luna.apk
+
+# PC server build
+server/build/
+server/dist/
+
+# Runtime data (not source)
+server/custom_icons/
+server/custom_sounds/
+server/custom_exes/
+dist/config.json
+dist/custom_*/
+
+# Android
+android/.gradle/
+android/app/build/
+android/local.properties
+android/luna.keystore
+
+# Python
+__pycache__/
+
+# IDE
+.vscode/

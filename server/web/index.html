@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0D0D0D">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <link rel="icon" href="/icon-192.png" type="image/png">
+  <title>Luna</title>
+  <link rel="stylesheet" href="/style.css?v=4">
+  <script src="/lang/i18n.js"></script>
+  <script>
+    if (localStorage.getItem('luna_cleanup_version') !== '5') {
+      localStorage.clear();
+      localStorage.setItem('luna_cleanup_version', '5');
+    }
+  </script>
+  <style>
+    /* Welcome overlay */
+    #welcome-overlay { position:fixed; inset:0; z-index:100001; background:rgba(0,0,0,0.75); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.5s ease; }
+    #welcome-overlay.welcome-visible { opacity:1; }
+    #welcome-overlay.welcome-hidden { display:none; }
+    #welcome-card { background:rgba(26,26,46,0.97); border:1px solid rgba(79,195,247,0.2); border-radius:16px; padding:18px 20px 16px; width:min(360px,calc(100vw - 32px)); max-height:80vh; overflow-y:auto; box-shadow:0 8px 40px rgba(0,0,0,0.6); animation:welcome-card-in 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes welcome-card-in { from {opacity:0;transform:translateY(16px) scale(0.95)} }
+    .wc-title { font-size:16px; font-weight:700; margin-bottom:2px; color:#FFF; }
+    .wc-subtitle { font-size:12px; color:#B0B0B0; margin-bottom:10px; line-height:1.4; }
+    .wc-desc { font-size:11px; color:#909090; line-height:1.5; margin-bottom:12px; }
+    .wc-step-title { font-size:12px; font-weight:700; color:#4FC3F7; margin-bottom:6px; }
+    .wc-steps { display:flex; flex-direction:column; gap:4px; margin-bottom:12px; }
+    .wc-step { display:flex; gap:6px; align-items:flex-start; font-size:11px; color:#B0B0B0; line-height:1.35; }
+    .wc-step-num { width:16px; height:16px; border-radius:50%; background:rgba(79,195,247,0.15); color:#4FC3F7; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+    .wc-footer { display:flex; flex-direction:column; align-items:center; gap:8px; }
+    .wc-start { background:rgba(79,195,247,0.12); border:1px solid rgba(79,195,247,0.3); color:#4FC3F7; border-radius:8px; padding:7px 22px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.15s; }
+    .wc-start:hover { background:rgba(79,195,247,0.22); }
+    .wc-easter { font-size:9px; color:#606060; text-align:center; line-height:1.3; }
+    .wc-lang-row { display:flex; align-items:center; gap:4px; justify-content:center; margin-top:2px; }
+    .wc-lang-label { font-size:9px; color:#606060; }
+    .wc-lang-opt { font-size:9px; color:#808080; cursor:pointer; padding:1px 5px; border-radius:3px; border:1px solid transparent; transition:all 0.15s; user-select:none; }
+    .wc-lang-opt:hover { color:#4FC3F7; border-color:rgba(79,195,247,0.3); }
+    .wc-lang-opt.active { color:#4FC3F7; border-color:rgba(79,195,247,0.3); background:rgba(79,195,247,0.1); }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1><img src="/logo_isotipo.png" class="header-logo" alt="">
+        <div class="header-title-group">
+          <span data-i18n="header.luna">LUNA</span>
+          <span class="panic-btn" style="cursor:default" data-i18n="header.panic">&#x26A0; &#xBF;Problemas?</span>
+        </div>
+      </h1>
+      <div id="mode-bar">
+        <img src="/icons/keyboard.png" class="mode-icon mode-active" data-mode="grid" data-i18n-alt="header.keyboard" alt="Teclado">
+        <img src="/icons/sliders.png" class="mode-icon" data-mode="sliders" data-i18n-alt="header.sliders" alt="Sliders">
+      </div>
+      <div id="status-bar">
+        <span class="dot" id="dot"></span>
+        <a href="/dashboard" id="dash-link" style="display:none"><img src="/icons/settings.png" class="ui-icon" data-i18n-alt="status.settings_alt" alt="Ajustes"></a>
+        <button id="rescan-qr-btn" class="rescan-qr-btn" style="display:none"><img src="/icons/qr-scan.png" class="ui-icon ui-icon-lg" data-i18n-alt="status.scan_qr_alt" alt="Escanear QR"></button>
+        <select id="lang-select" class="lang-select" style="display:none" data-i18n-tooltip="lang.tooltip" title="Change language"><option value="es">ES</option><option value="en">EN</option><option value="pt">PT</option></select>
+        <button id="ui-toggle" class="ui-toggle-btn" data-i18n-tooltip="status.hide_ui_title" title="Ocultar UI"><img src="/icons/hide.png" class="ui-icon ui-icon-lg" data-i18n-alt="status.hide_ui_alt" alt="Ocultar UI"></button>
+      </div>
+    </header>
+    <script>(function(){if(navigator.userAgent.indexOf('LunaDesktop')>=0){document.documentElement.className='desktop';document.getElementById('dash-link').style.display='';var ls=document.getElementById('lang-select');if(ls){ls.style.display='';ls.onchange=function(){setLanguage(this.value)};
+var l=(localStorage.getItem('luna_lang')||'');if(l)ls.value=l}}})()</script>
+
+    <div id="size-row" class="size-row" data-i18n-tooltip="slider.tooltip" data-tooltip="Arrastra el dedo para controlar el volumen del sistema, el brillo de tu pantalla o hacer scroll de forma súper suave.">
+      <span class="size-label">&#x1F5B1;</span>
+      <input type="range" id="size-slider" class="size-slider" min="0" max="100" value="50">
+      <span class="size-label">&#x1F5A5;</span>
+    </div>
+
+    <div id="profile-bar" class="profile-hidden"></div>
+
+    <div id="preset-bar" class="preset-hidden"></div>
+
+    <main id="canvas" class="disconnected"></main>
+
+    <main id="sliders-canvas" class="disconnected hidden">
+      <div class="slider-card" id="card-volume">
+        <div class="slider-label" data-i18n="slider.volume">&#x1F50A; Volumen</div>
+        <div class="slider-value" id="volume-value">50%</div>
+        <input type="range" class="slider-input" id="slider-volume" min="0" max="255" value="128">
+      </div>
+      <div class="slider-card" id="card-brightness">
+        <div class="slider-label"><img src="/icons/brightness-up.png" class="ui-icon" alt=""> <span data-i18n="slider.brightness">Brillo</span></div>
+        <div class="slider-value" id="brightness-value">50%</div>
+        <input type="range" class="slider-input" id="slider-brightness" min="0" max="255" value="128">
+      </div>
+      <div class="slider-card scroll-card" id="card-scroll-v">
+        <div class="slider-label"><img src="/icons/scroll-v.png" class="ui-icon" alt=""> <span data-i18n="slider.scroll_v">Despl. V</span></div>
+        <div class="scroll-hint" data-i18n="slider.hint">Arrastra aqu&iacute;</div>
+        <div class="scroll-pad" id="scroll-pad-v">
+          <div class="scroll-thumb" id="scroll-thumb-v"></div>
+        </div>
+      </div>
+      <div class="slider-card scroll-card" id="card-scroll-h">
+        <div class="slider-label"><img src="/icons/scroll-h.png" class="ui-icon" alt=""> <span data-i18n="slider.scroll_h">Despl. H</span></div>
+        <div class="scroll-hint" data-i18n="slider.hint">Arrastra aqu&iacute;</div>
+        <div class="scroll-pad" id="scroll-pad-h">
+          <div class="scroll-thumb" id="scroll-thumb-h"></div>
+        </div>
+      </div>
+    </main>
+
+    <div id="conn-info">
+      <span id="conn-ip"></span>
+      <button id="conn-qr-btn" class="conn-qr-btn" data-i18n-tooltip="qr.tooltip" title="Mostrar QR" data-tooltip="Tu pase de acceso. Escanéalo con tu móvil para conectar al instante. Si la red se pone tímida, escribe la IP en el navegador de tu teléfono."><img src="/icons/qr-show.png" class="ui-icon" data-i18n-alt="qr.alt" alt="QR"></button>
+      <button id="pro-purchase-btn" class="conn-qr-btn ad-banner-hidden">&#x1F451; Pro</button>
+
+    </div>
+
+  </div>
+
+  <button id="show-ui-btn" class="show-ui-btn"><img src="/icons/show-ui.png" class="ui-icon" data-i18n-alt="show_ui.alt" alt="Mostrar UI"></button>
+
+  <div id="toast" class="toast-hidden"></div>
+
+  <div id="apk-banner" class="apk-banner-hidden">
+    <div class="apk-banner-body">
+      <span class="apk-banner-icon">&#x1F4F1;</span>
+      <span class="apk-banner-text" data-i18n="apk_banner.text">&#xBF;Prefieres sin barra? Descarga la app <strong>Luna APK</strong></span>
+      <a class="apk-banner-link" href="https://github.com/Sr-Lolo/luna/releases/latest/download/Luna.apk" data-i18n="apk_banner.download">Descargar</a>
+    </div>
+    <button class="apk-banner-tab" id="apk-banner-tab">&#x25BC;</button>
+  </div>
+
+  <div id="pro-modal" class="pro-modal-hidden">
+    <div class="pro-modal-content">
+      <button class="pro-modal-close" id="pro-modal-close">&times;</button>
+      <h2 class="pro-modal-title">👑 Luna Pro</h2>
+      <p class="pro-modal-sub" data-i18n="pro.subtitle">Desbloquea todo el potencial de Luna</p>
+      <ul class="pro-benefits">
+        <li><span data-i18n="pro.benefit1">📋 Perfiles ilimitados (sin límite de 3)</span></li>
+        <li><span data-i18n="pro.benefit2">🎬 Sube GIFs animados en tus botones</span></li>
+        <li><span data-i18n="pro.benefit3">🚫 Sin anuncios en PC ni en el móvil</span></li>
+        <li><span data-i18n="pro.benefit4">✨ Todas las funciones sin restricciones</span></li>
+      </ul>
+      <button id="pro-buy-btn" class="pro-buy-btn" data-i18n="pro.buy_button">💳 Comprar Pro</button>
+      <div id="pro-store-link-wrap" class="pro-store-link-hidden">
+        <p class="pro-modal-note">Si no se abre automáticamente, haz clic aquí:</p>
+        <a id="pro-store-link" href="#" target="_blank" class="pro-store-link">Abrir Microsoft Store</a>
+        <p class="pro-modal-note" style="margin-top:8px">Después de comprar, reinicia Luna para activarlo.</p>
+      </div>
+      <p class="pro-modal-note" data-i18n="pro.note" id="pro-modal-note-orig">Al hacer clic en Comprar se activar&aacute; tu licencia Pro de prueba.</p>
+      <p class="pro-lifetime" data-i18n="pro.lifetime">🔒 Pro de por vida — incluye todas las actualizaciones futuras</p>
+    </div>
+  </div>
+
+  <div id="qr-modal" class="qr-modal-hidden">
+    <div class="qr-modal-content">
+      <div class="qr-tabs">
+        <button class="qr-tab qr-tab-active" data-qr="connect" data-i18n="qr.tab_connect">Conectar</button>
+        <button class="qr-tab" data-qr="apk" data-i18n="qr.tab_apk">Descargar APK</button>
+      </div>
+      <img id="qr-img" src="" alt="QR">
+      <p id="qr-ip-label"></p>
+      <p id="qr-apk-label" style="display:none" data-i18n="qr.apk_label">Escanea para descargar la app Luna APK en tu movil</p>
+      <button id="qr-close-btn" class="qr-close-btn" data-i18n="qr_modal.close">Cerrar</button>
+    </div>
+  </div>
+
+
+  <div id="luna-close-overlay" class="luna-close-overlay">
+    <div class="luna-close-card">
+      <div class="luna-close-title" data-i18n="close_dialog.title">&#x2705; &#xBF;Cerrar Luna?</div>
+      <div class="luna-close-desc" data-i18n="close_dialog.desc">La app seguir&aacute; funcionando en segundo plano si la minimizas.</div>
+      <div class="luna-close-buttons">
+        <button class="luna-close-btn luna-close-primary" onclick="cerrarSegundoPlano()" data-i18n="close_dialog.background">&#x1F4E5; Segundo plano</button>
+        <button class="luna-close-btn luna-close-danger" onclick="cerrarCompletamente()" data-i18n="close_dialog.close">&#x274C; Cerrar</button>
+        <button class="luna-close-btn luna-close-cancel" onclick="cancelarCierre()" data-i18n="close_dialog.cancel">&larr; Seguir aqu&iacute;</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="ad-banner" class="ad-banner ad-banner-hidden">
+    <iframe id="ad-frame" class="ad-frame" frameborder="0" scrolling="no" allow="autoplay" referrerpolicy="no-referrer"></iframe>
+  </div>
+
+  <div id="welcome-overlay" class="welcome-hidden">
+    <div id="welcome-card">
+      <div class="wc-title" data-i18n="welcome_dash.title">Bienvenido a LunaDeck!</div>
+      <div class="wc-subtitle" data-i18n="welcome_dash.subtitle">Tu espacio de trabajo, elevado al siguiente nivel.</div>
+      <div class="wc-desc" data-i18n="welcome_dash.desc">LunaDeck es tu nuevo centro de mando personalizado. Disenado para ofrecerte control total sobre macros, accesos rapidos y multimedia desde tu movil, con una latencia tan baja que se siente como parte de tu hardware.</div>
+      <div class="wc-step-title" data-i18n="welcome_dash.step_title">Configuracion en 3 pasos:</div>
+      <div class="wc-steps">
+        <div class="wc-step"><span class="wc-step-num">1</span><span data-i18n="welcome_dash.step1">Abre la app movil de LunaDeck en tu dispositivo.</span></div>
+        <div class="wc-step"><span class="wc-step-num">2</span><span data-i18n="welcome_dash.step2">Escanea el codigo QR que ves en pantalla (es el mismo QR que sale en la interfaz de la aplicacion).</span></div>
+        <div class="wc-step"><span class="wc-step-num">3</span><span data-i18n="welcome_dash.step3">Listo! Tu conexion es segura, instantanea y estas listo para tomar el control.</span></div>
+      </div>
+      <div class="wc-footer">
+        <button class="wc-start" id="wc-start" data-i18n="welcome_dash.start">Comenzar</button>
+        <div class="wc-lang-row">
+          <span class="wc-lang-label" data-i18n="welcome_dash.lang_label">Idioma:</span>
+          <span class="wc-lang-opt" data-lang="es">ES</span>
+          <span class="wc-lang-opt" data-lang="en">EN</span>
+          <span class="wc-lang-opt" data-lang="pt">PT</span>
+        </div>
+        <div class="wc-easter" data-i18n="welcome_dash.easter_egg">[i] Puedes restaurar tutoriales y esta bienvenida dando 5 clics rapidos en la palabra LUNA</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js?v=4"></script>
+  <script>
+  (function(){
+    var banner = document.getElementById('ad-banner');
+    var frame = document.getElementById('ad-frame');
+    if (!banner || !frame) return;
+    if (!document.documentElement.classList.contains('desktop')) return;
+    fetch('/api/pro-status')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.pro) return;
+        banner.classList.remove('ad-banner-hidden');
+        frame.src = 'https://sr-lolo.github.io/luna/ad_pc.html';
+        document.body.style.paddingBottom = '60px';
+      })
+      .catch(function(e) { console.warn('Ad pro-status fetch failed:', e); });
+  })();
+  </script>
+  <script>
+  (function(){
+    if (localStorage.getItem('luna_welcome_shown') === '1') return;
+    var overlay = document.getElementById('welcome-overlay');
+    if (!overlay) return;
+    var ready = setInterval(function() {
+      if (typeof __('welcome_dash.title') !== 'string' || __('welcome_dash.title').indexOf('welcome_dash.') === 0) return;
+      clearInterval(ready);
+      overlay.classList.remove('welcome-hidden');
+      overlay.classList.add('welcome-visible');
+      document.getElementById('wc-start').addEventListener('click', function() {
+        overlay.classList.add('welcome-hidden');
+        localStorage.setItem('luna_welcome_shown', '1');
+      });
+      var curLang = localStorage.getItem('luna_lang') || (navigator.language||navigator.userLanguage||'').split('-')[0] || 'en';
+      if (!['es','en','pt'].includes(curLang)) curLang = 'en';
+      document.querySelectorAll('.wc-lang-opt').forEach(function(el) {
+        if (el.getAttribute('data-lang') === curLang) el.classList.add('active');
+        el.addEventListener('click', function() {
+          window.setLanguage(this.getAttribute('data-lang'));
+        });
+      });
+    }, 100);
+  })();
+  </script>
+
+  <div id="server-error-banner" class="server-error-hidden" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#5C1A1A;border-top:1px solid #8B2A2A;padding:8px 16px;z-index:99999;flex-direction:row;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap">
+    <span style="color:#FFB0B0;font-size:12px">&#x1F534; <span id="server-error-text" data-i18n="server.error_desc">Revisa tu Firewall o el puerto 9120.</span></span>
+    <button id="server-retry-btn" class="server-retry-btn" style="background:#4FC3F7;color:#000;border:none;border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer" data-i18n="server.retry">Reintentar Conexi&oacute;n</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       EASTER EGG: 5 clics en LUNA → reinicia tutoriales/welcome
+       Muestra progreso visual [·] [··] [···] [····] [·····] y toast.
+       ═══════════════════════════════════════════════════════════════ -->
+  <span id="luna-egg-counter" style="position:fixed;top:45px;left:50%;transform:translateX(-50%);font-size:18px;letter-spacing:4px;color:#4FC3F7;pointer-events:none;z-index:100000;opacity:0;transition:opacity 0.2s;">[·]</span>
+  <script>
+  (function() {
+    var count = 0, timer = null;
+    var el = document.querySelector('[data-i18n="header.luna"]');
+    if (!el) return;
+    var counter = document.getElementById('luna-egg-counter');
+    el.style.cursor = 'pointer';
+    el.addEventListener('click', function() {
+      count++;
+      clearTimeout(timer);
+      if (counter) {
+        var dots = '';
+        for (var i = 0; i < count; i++) dots += '\u00B7';
+        counter.textContent = '[' + dots + ']';
+        counter.style.opacity = count < 5 ? '0.8' : '1';
+      }
+      timer = setTimeout(function() {
+        count = 0;
+        if (counter) { counter.style.opacity = '0'; }
+      }, 3000);
+      if (count >= 5) {
+        count = 0;
+        localStorage.removeItem('luna_dashboard_tutorial_complete');
+        localStorage.removeItem('luna_welcome_shown');
+        localStorage.removeItem('luna_open_count');
+        localStorage.removeItem('luna_feedback_given');
+        if (counter) counter.textContent = '[\u2713]';
+        var t = document.getElementById('toast');
+        if (t) {
+          t.textContent = '\u2713 Tutoriales y consejos reiniciados';
+          t.className = '';
+          setTimeout(function() {
+            if (t) t.className = 'toast-hidden';
+            if (counter) setTimeout(function() { counter.style.opacity = '0'; }, 500);
+          }, 3000);
+        }
+      }
+    });
+  })();
+  </script>
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+</body>
+</html>

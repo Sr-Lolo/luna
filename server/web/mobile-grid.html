@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Luna Grid</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#0D0D0D;color:#fff;font-family:sans-serif}
+#grid{display:grid;width:100%;height:100%;gap:6px;padding:6px}
+#grid button{background:#1E1E1E;border:1px solid #333;border-radius:8px;color:#fff;font-size:11px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;min-height:0;position:relative;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#grid button:active{background:#333}
+#grid button img{max-width:70%;max-height:70%;pointer-events:none}
+#grid button .label{font-size:9px;margin-top:2px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90%}
+body.disconnected #grid{display:flex;align-items:center;justify-content:center}
+body.disconnected #grid::after{content:"Conectando...";font-size:14px;color:#888}
+#grid button.empty{visibility:hidden}
+</style>
+</head>
+<body class="disconnected">
+<div id="grid"></div>
+<script>
+var profiles={},currentProfile=null,lastConfig=null;
+
+function updateConfig(jsonStr){
+  try{
+    lastConfig=JSON.parse(jsonStr);
+    profiles=lastConfig.profiles||{};
+    currentProfile=lastConfig.current_profile||Object.keys(profiles)[0]||null;
+    document.body.classList.remove('disconnected');
+    renderGrid();
+  }catch(e){console.warn('updateConfig error:',e)}
+}
+
+function renderGrid(){
+  var grid=document.getElementById('grid');
+  grid.innerHTML='';
+  if(!currentProfile||!profiles[currentProfile]){document.body.classList.add('disconnected');return}
+  var p=profiles[currentProfile],cols=p.cols||4,keys=p.keys||[];
+  var total=Math.ceil((keys.length||1)/cols)*cols;
+  grid.style.gridTemplateColumns='repeat('+cols+',1fr)';
+  for(var i=0;i<total;i++){
+    var btn=document.createElement('button');
+    if(i<keys.length){
+      var k=keys[i];
+      var iconUrl=null;
+      if(k.icon&&k.icon.startsWith('custom/')) iconUrl='/custom-icons/'+k.icon.replace('custom/','');
+      else if(k.icon) iconUrl='/icons/'+k.icon+'.png';
+      if(iconUrl){
+        var img=document.createElement('img');img.src=iconUrl;img.alt=k.label;img.draggable=false;
+        btn.appendChild(img);
+        if(k.label){var sp=document.createElement('span');sp.className='label';sp.textContent=k.label;btn.appendChild(sp)}
+      }else{
+        btn.textContent=k.label||'';
+      }
+      if(k.cls)btn.className=k.cls;
+      if(k.mods){
+        btn.addEventListener('pointerdown',(function(b){return function(e){
+          e.preventDefault();
+          if(navigator.vibrate)navigator.vibrate(8);
+          try{LunaBridge.sendKeyTap(b.key,b.mods)}catch(ex){}
+        }})(k));
+      }else{
+        btn.addEventListener('pointerdown',(function(b){return function(e){
+          e.preventDefault();
+          if(navigator.vibrate)navigator.vibrate(8);
+          try{LunaBridge.sendKeyPress(b.key,0)}catch(ex){}
+        }})(k));
+        btn.addEventListener('pointerup',(function(b){return function(e){
+          e.preventDefault();
+          try{LunaBridge.sendKeyRelease(b.key,0)}catch(ex){}
+        }})(k));
+      }
+    }else{
+      btn.className='empty';
+    }
+    grid.appendChild(btn);
+  }
+}
+
+function switchProfile(name){
+  currentProfile=name;
+  renderGrid();
+}
+</script>
+</body>
+</html>
